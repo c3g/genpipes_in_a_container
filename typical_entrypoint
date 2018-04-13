@@ -1,0 +1,1 @@
+./parrot.sh -a /cvmfs-cache/cache/cvmfs2/shared -c config.d/
