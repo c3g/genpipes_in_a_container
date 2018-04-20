@@ -3,22 +3,32 @@
 # cctools's parrot's cvmfs options
 # For more details on cvmfs and the parrot connector got to:
 # http://cvmfs.readthedocs.io/en/stable/cpt-configure.html#parrot-connector-to-cernvm-fs
+# It also loads the lmod software to load mugqic modules 
+
 export PARROT_ALLOW_SWITCHING_CVMFS_REPOSITORIES=yes
 CVMFS_CONFIG_CC=cvmfs-config.computecanada.ca:url=cvmfs-s1-east.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub
 export PARROT_CVMFS_REPO="${CVMFS_CONFIG_CC}"
 export HTTP_PROXY='http://gr-1r15-n01:3130;DIRECT' 
 
+LOCAL_CONFIG_PATH=/etc/parrot
+PARROT_CVMFS_ALIEN_CACHE=/cvmfs-cache/cvmfs/shared/
+export MUGQIC_INSTALL_HOME=/cvmfs/soft.mugqic/CentOS6
 
 usage (){
-  echo -e "\nUsage: $0 [-c <PATH>] " 1>&2;
+  echo -e "\nUsage: $0 [-c <PATH>] [-a <PATH>] [-p <PATH> ] [-V <X.X.X> ]" 1>&2;
   echo -e "\nOPTION"
   echo -e "\t-a  Set the path of the cache use to store cvmfs data"
+  echo -e "\t      default: /cvmfs-cache/cvmfs/shared/"
   echo -e "\t-c  Set the path for local cvmfs repo config"
+  echo -e "\t      default: /etc/parrot/"
+  echo -e "\t-p  Set the path for the mugqic software stack"
+  echo -e "\t      default: ${MUGQIC_INSTALL_HOME}"
+  echo -e "\t-V    Genpipe suite version"
   echo
 }
 
 
-while getopts ":a:c:" opt; do
+while getopts ":a:c:p:" opt; do
   case $opt in
     a)
       echo "Setting parrot alien cache to $OPTARG"
@@ -27,6 +37,12 @@ while getopts ":a:c:" opt; do
     c)
       echo "Using local cvmfs config path $OPTARG"
       LOCAL_CONFIG_PATH=${OPTARG}
+      ;;
+    p)
+      MUGQIC_INSTALL_HOME=${OPTARG}
+      ;;
+    V)
+      PIPELINE_VERSION=/${OPTARG}
       ;;
     h)
       usage
@@ -73,11 +89,15 @@ cvmfs_to_parrot() {
 read ref_url ref_key < <(cvmfs_to_parrot  ref.mugqic)
 read soft_url soft_key < <(cvmfs_to_parrot  soft.mugqic)
 
-
+# The <default-repositories> option is important when cvmfs repo are 
+# already present in the cvmfs directory. Parrot will not try to remount
+# the fs in that case.
 export PARROT_CVMFS_REPO="<default-repositories> \
 	${CVMFS_CONFIG_CC} \
 	soft.mugqic:url=$soft_url,pubkey=$KEY_PATH/soft.mugqic.pub \
 	ref.mugqic:url=$ref_url,pubkey=$KEY_PATH/ref.mugqic.pub"
 
-/opt/cctools-6.2.8-x86_64-redhat7/bin/parrot_run bash
+
+# load cvmfs 
+/opt/cctools-6.2.8-x86_64-redhat7/bin/parrot_run  bash --rcfile /usr/local/etc/genpiperc
 

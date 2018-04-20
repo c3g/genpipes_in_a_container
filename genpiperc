@@ -1,0 +1,8 @@
+source /etc/bashrc
+source ~/.bashrc
+echo -e "\nWait while GenAP module are loaded this could take a while"
+echo    "  especially if the cvmfs cache is new"
+module use $MUGQIC_INSTALL_HOME/modulefiles
+module load mugqic/python/2.7.14
+module load mugqic/GenAP_Pipes${PIPELINE_VERSION}
+
