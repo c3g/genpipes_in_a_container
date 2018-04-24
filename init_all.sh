@@ -11,19 +11,19 @@ export PARROT_CVMFS_REPO="${CVMFS_CONFIG_CC}"
 export HTTP_PROXY='http://gr-1r15-n01:3130;DIRECT' 
 
 LOCAL_CONFIG_PATH=/etc/parrot
-PARROT_CVMFS_ALIEN_CACHE=/cvmfs-cache/cvmfs/shared/
+export PARROT_CVMFS_ALIEN_CACHE=/cvmfs-cache/parrot
 export MUGQIC_INSTALL_HOME=/cvmfs/soft.mugqic/CentOS6
 
 usage (){
   echo -e "\nUsage: $0 [-c <PATH>] [-a <PATH>] [-p <PATH> ] [-V <X.X.X> ]" 1>&2;
   echo -e "\nOPTION"
   echo -e "\t-a  Set the path of the cache use to store cvmfs data"
-  echo -e "\t      default: /cvmfs-cache/cvmfs/shared/"
+  echo -e "\t      default: ${PARROT_CVMFS_ALIEN_CACHE}"
   echo -e "\t-c  Set the path for local cvmfs repo config"
-  echo -e "\t      default: /etc/parrot/"
+  echo -e "\t      default: ${LOCAL_CONFIG_PATH}"
   echo -e "\t-p  Set the path for the mugqic software stack"
   echo -e "\t      default: ${MUGQIC_INSTALL_HOME}"
-  echo -e "\t-V    Genpipe suite version"
+  echo -e "\t-V    Genpipes version (if other then module default)"
   echo
 }
 

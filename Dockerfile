@@ -35,9 +35,8 @@ RUN ["ln", "-s", "/opt/apps/lmod/lmod/init/profile", "/etc/profile.d/z00_lmod.sh
 RUN echo "source /etc/profile.d/z00_lmod.sh" >>  /etc/bashrc
 
 ADD genpiperc    /usr/local/etc/genpiperc
-ADD init_all.sh /usr/local/bin/init_all
-ADD init_all.sh /usr/local/bin/init_all
-RUN chmod 755 /usr/local/bin/init_all
+ADD init_all.sh /usr/local/bin/init_genpipes
+RUN chmod 755 /usr/local/bin/init_genpipes
 
-ENTRYPOINT ["init_all", "-a", "/cvmfs-cache/cvmfs/shared/", "-c", "/etc/parrot/"]
+ENTRYPOINT ["init_genpipes", "-a", "/cvmfs-cache/cvmfs/shared/", "-c", "/etc/parrot/"]
 # docker build --tag truite .
