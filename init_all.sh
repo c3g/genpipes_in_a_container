@@ -94,8 +94,8 @@ read soft_url soft_key < <(cvmfs_to_parrot  soft.mugqic)
 # the fs in that case.
 export PARROT_CVMFS_REPO="<default-repositories> \
 	${CVMFS_CONFIG_CC} \
-	soft.mugqic:url=$soft_url,pubkey=$KEY_PATH/soft.mugqic.pub \
-	ref.mugqic:url=$ref_url,pubkey=$KEY_PATH/ref.mugqic.pub"
+	soft.mugqic:url=$soft_url,pubkey=$KEY_PATH/soft.mugqic.pub,try_local_filesystem \
+	ref.mugqic:url=$ref_url,pubkey=$KEY_PATH/ref.mugqic.pub,try_local_filesystem"
 
 
 # load cvmfs 
