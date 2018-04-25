@@ -8,7 +8,8 @@
 export PARROT_ALLOW_SWITCHING_CVMFS_REPOSITORIES=yes
 CVMFS_CONFIG_CC=cvmfs-config.computecanada.ca:url=cvmfs-s1-east.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub
 export PARROT_CVMFS_REPO="${CVMFS_CONFIG_CC}"
-export HTTP_PROXY='http://gr-1r15-n01:3130;DIRECT' 
+#export HTTP_PROXY='http://gr-1r15-n01:3130;DIRECT' 
+export HTTP_PROXY='DIRECT' 
 
 LOCAL_CONFIG_PATH=/etc/parrot
 export PARROT_CVMFS_ALIEN_CACHE=/cvmfs-cache/parrot

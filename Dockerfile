@@ -16,14 +16,13 @@ RUN mkdir /etc/parrot
 ADD config.d /etc/parrot/. 
 RUN mkdir /cvmfs-cache && chmod 777 /cvmfs-cache
 
-# lmod (module)
-ENV LUAROCKS_VERSION 2.4.2
-ENV LUAROCKS_INSTALL luarocks-$LUAROCKS_VERSION
-ENV LMOD_V 7.7.22
-RUN wget  https://luarocks.org/releases/${LUAROCKS_INSTALL}.tar.gz
-RUN tar xzf $LUAROCKS_INSTALL.tar.gz && \
-    rm $LUAROCKS_INSTALL.tar.gz
-RUN cd luarocks-$LUAROCKS_VERSION && ./configure && make build && make install
+# module
+RUN yum install -y dejagnu
+ENV MODULE_VERSION 4.1.2
+RUN wget https://github.com/cea-hpc/modules/releases/download/v${MODULE_VERSION}/modules-${MODULE_VERSION}.tar.gz 
+RUN tar xzf modules-${MODULE_VERSION}.tar.gz && \
+    rm modules-${MODULE_VERSION}.tar.gz
+RUN cd  modules-${MODULE_VERSION}  && ./configure && make build && make install
 
 RUN luarocks install luaposix; luarocks install luafilesystem
 ENV LUAROCKS_PREFIX /usr/local
