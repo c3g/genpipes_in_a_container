@@ -33,10 +33,12 @@ RUN wget https://github.com/TACC/Lmod/archive/$LMOD_V.tar.gz && tar -xvf $LMOD_V
 RUN cd Lmod-$LMOD_V && ./configure --prefix=/opt/apps && make install
 RUN ["ln", "-s", "/opt/apps/lmod/lmod/init/profile", "/etc/profile.d/z00_lmod.sh"]
 RUN echo "source /etc/profile.d/z00_lmod.sh" >>  /etc/bashrc
+ADD devmodule/genpipes "/opt/apps/modulefiles/Core/."
 
 ADD genpiperc    /usr/local/etc/genpiperc
 ADD init_all.sh /usr/local/bin/init_genpipes
 RUN chmod 755 /usr/local/bin/init_genpipes
+
 
 ENTRYPOINT ["init_genpipes", "-a", "/cvmfs-cache/cvmfs/shared/", "-c", "/etc/parrot/"]
 # docker build --tag truite .

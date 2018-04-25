@@ -6,7 +6,7 @@ proc ModulesHelp { } {
 module-whatis "genpipes"
 set             root                  $env(GENPIPES_DEV_DIR)
 if { [ module-info mode load ] } {
-    puts stderr unloading mugqic/genpipes
+    puts stderr "unloading mugqic/genpipes"
     module unload mugqic/genpipes
     puts stderr "Load GENPIPES available in '$root'"
 }
