@@ -1,6 +1,6 @@
 source /etc/bashrc
 source ~/.bashrc
-echo -e "\nWait while Genpipes module are loaded this could take a while"
+echo -e "\nWait while Genpipes module are loaded. This could take a while,"
 echo -e   "  especially if the cvmfs cache is new\n"
 module use $MUGQIC_INSTALL_HOME/modulefiles
 module load mugqic/python/2.7.14
