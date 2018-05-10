@@ -13,7 +13,8 @@ RUN wget http://ccl.cse.nd.edu/software/files/cctools-6.2.8-x86_64-redhat7.tar.g
 ADD cvmfs-config.computecanada.ca.pub /etc/cvmfs/keys/.
 RUN chmod 4755 /bin/ping
 RUN mkdir /etc/parrot 
-ADD config.d /etc/parrot/. 
+# adding local config to containe. These will overwrite the cvmfs-config.computecanada ones
+ADD config.d /etc/parrot/.
 RUN mkdir /cvmfs-cache && chmod 777 /cvmfs-cache
 
 # module
@@ -22,7 +23,7 @@ RUN wget https://github.com/cea-hpc/modules/releases/download/v${MODULE_VERSION}
 RUN tar xzf modules-${MODULE_VERSION}.tar.gz && \
     rm modules-${MODULE_VERSION}.tar.gz
 RUN cd  modules-${MODULE_VERSION}  && ./configure && make -j 7  && make install
-RUN ["ln", "-s", "/usr/local/Modules/init/profile.sh", "/etc/profile.d/z00_lmod.sh"]
+RUN ["ln", "-s", "/usr/local/Modules/init/profile.sh", "/etc/profile.d/z00_module.sh"]
 RUN echo "source /etc/profile.d/z00_module.sh" >>  /etc/bashrc
 
 ADD devmodule/genpipes "/usr/local/Modules/modulefiles/."
