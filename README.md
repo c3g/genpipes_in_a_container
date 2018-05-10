@@ -2,7 +2,7 @@
 
 A container to create and run Genpipes pipelines anywhere. Only user priviledge are required.
 
-[READ the genpipes documentation](https://bitbucket.org/mugqic/genpipes)
+[Read the genpipes documentation](https://bitbucket.org/mugqic/genpipes)
 
 [The project Docker hub page](https://hub.docker.com/r/cccg/genpipes/)
 
