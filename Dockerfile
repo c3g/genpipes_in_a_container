@@ -25,7 +25,7 @@ RUN tar xzf modules-${MODULE_VERSION}.tar.gz && \
 RUN cd  modules-${MODULE_VERSION}  && ./configure && make -j 7  && make install
 RUN ["ln", "-s", "/usr/local/Modules/init/profile.sh", "/etc/profile.d/z00_module.sh"]
 RUN echo "source /etc/profile.d/z00_module.sh" >>  /etc/bashrc
-
+RUN rm -rf /usr/local/Modules/modulefiles/*
 ADD devmodule/genpipes "/usr/local/Modules/modulefiles/."
 
 ADD genpiperc    /usr/local/etc/genpiperc
