@@ -16,7 +16,7 @@ export PARROT_CVMFS_ALIEN_CACHE=/cvmfs-cache/parrot
 export MUGQIC_INSTALL_HOME=/cvmfs/soft.mugqic/CentOS6
 
 usage (){
-  echo -e "\nUsage: $0 [-c <PATH>] [-a <PATH>] [-p <PATH> ] [ -d <PATH> ] [-V <X.X.X> ]" 1>&2;
+  echo -e "\nUsage: $0 [-c <PATH>] [-a <PATH>] [-p <PATH> ] [ -d <PATH> ] [-V <X.X.X> ] [-e <cmd>] " 1>&2;
   echo -e "\nOPTION"
   echo -e "\t-a  Set the path of the cache use to store cvmfs data"
   echo -e "\t      default: ${PARROT_CVMFS_ALIEN_CACHE}"
@@ -25,13 +25,14 @@ usage (){
   echo -e "\t-p  Set the path for the mugqic software stack"
   echo -e "\t      default: ${MUGQIC_INSTALL_HOME}"
   echo -e "\t-d  Set a path to a genpipes repo that can supersedes"
-  echo -e "\t      the soft.mugqic repo's version (developer mode)"
+  echo -e "\t      the soft.mugqic repo's version (developer's mode)"
   echo -e "\t-V    Genpipes version (if other then module default)"
+  echo -e "\t-e  Execute specific command and exit"
   echo
 }
 
 
-while getopts ":a:d:c:p:" opt; do
+while getopts ":a:d:c:p:e:" opt; do
   case $opt in
     a)
       echo "Setting parrot alien cache to $OPTARG"
@@ -49,6 +50,9 @@ while getopts ":a:d:c:p:" opt; do
       ;;
     d)
       export GENPIPES_DEV_DIR=/${OPTARG}
+      ;;
+    e)
+      EXEC_CMD="-c ${OPTARG}"
       ;;
     h)
       usage
@@ -105,5 +109,5 @@ export PARROT_CVMFS_REPO="<default-repositories> \
 
 
 # load cvmfs 
-/opt/cctools-6.2.8-x86_64-redhat7/bin/parrot_run  bash --rcfile /usr/local/etc/genpiperc
+/opt/cctools-6.2.8-x86_64-redhat7/bin/parrot_run  bash --rcfile /usr/local/etc/genpiperc ${EXEC_CMD}
 
