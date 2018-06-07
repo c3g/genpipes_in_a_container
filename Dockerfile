@@ -33,4 +33,4 @@ ADD init_all.sh /usr/local/bin/init_genpipes
 RUN chmod 755 /usr/local/bin/init_genpipes
 
 ENTRYPOINT ["init_genpipes", "-a", "/cvmfs-cache/cvmfs/shared/", "-c", "/etc/parrot/"]
-# docker build --tag truite .
+# docker build --tag cccg/genpipes .

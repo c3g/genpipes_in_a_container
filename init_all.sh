@@ -16,7 +16,7 @@ export PARROT_CVMFS_ALIEN_CACHE=/cvmfs-cache/parrot
 export MUGQIC_INSTALL_HOME=/cvmfs/soft.mugqic/CentOS6
 
 usage (){
-  echo -e "\nUsage: $0 [-c <PATH>] [-a <PATH>] [-p <PATH> ] [ -d <PATH> ] [-V <X.X.X> ] [-e <cmd>] " 1>&2;
+  echo -e "\nUsage: $0 [-c <PATH>] [-a <PATH>] [-p <PATH> ] [ -d <PATH> ] [-V <X.X.X> ] [ <cmd> ] " 1>&2;
   echo -e "\nOPTION"
   echo -e "\t-a  Set the path of the cache use to store cvmfs data"
   echo -e "\t      default: ${PARROT_CVMFS_ALIEN_CACHE}"
@@ -32,7 +32,7 @@ usage (){
 }
 
 
-while getopts ":a:d:c:p:e:" opt; do
+while getopts ":a:d:c:p:" opt; do
   case $opt in
     a)
       echo "Setting parrot alien cache to $OPTARG"
@@ -51,9 +51,6 @@ while getopts ":a:d:c:p:e:" opt; do
     d)
       export GENPIPES_DEV_DIR=/${OPTARG}
       ;;
-    e)
-      EXEC_CMD="-c ${OPTARG}"
-      ;;
     h)
       usage
       exit 0
@@ -69,8 +66,19 @@ while getopts ":a:d:c:p:e:" opt; do
       ;;
   esac
 done
-
-
+shift $((OPTIND-1))
+# move the execline to a script
+if [ $# -gt 0 ] ; then
+ echo $#
+  function finish {
+    rm ${genpipe_script}
+  }
+  genpipe_script=$(mktemp /tmp/genpipe_script.XXXXXX)
+  trap finish EXIT
+  chmod 755 ${genpipe_script}
+  echo $@ > ${genpipe_script}
+fi
+  
 # copy the compute.canada config locally, this will let the other repo be mounted.
 /opt/cctools-6.2.8-x86_64-redhat7/bin/parrot_run cp -r /cvmfs/cvmfs-config.computecanada.ca /tmp/. 2>/dev/null
 
@@ -109,5 +117,9 @@ export PARROT_CVMFS_REPO="<default-repositories> \
 
 
 # load cvmfs 
-/opt/cctools-6.2.8-x86_64-redhat7/bin/parrot_run  bash --rcfile /usr/local/etc/genpiperc ${EXEC_CMD}
+if [  ${genpipe_script}  ]; then
+  /opt/cctools-6.2.8-x86_64-redhat7/bin/parrot_run  bash --rcfile /usr/local/etc/genpiperc -ic ${genpipe_script}
+else 
+  /opt/cctools-6.2.8-x86_64-redhat7/bin/parrot_run  bash --rcfile /usr/local/etc/genpiperc 
+fi
 
