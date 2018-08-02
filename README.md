@@ -25,3 +25,29 @@ singularity run [ -B < /HOST/CACHE/ >:/cvmfs-cache/  ] docker://cccg/genpipes:<T
 You can also [Read the genpipes documentation](https://bitbucket.org/mugqic/genpipes)
 
 Here is [the project's Docker hub page](https://hub.docker.com/r/cccg/genpipes/)
+
+
+## Setup a dev enviroment
+
+You can use this container to develop and test new version of GenPipes.
+
+Fist, clone genpipe somewhere under your $HOME folder three. 
+
+```
+git clone https://bitbucket.org/mugqic/genpipes $HOME/some/dir/genpipes
+```
+Add the followin line to your .bashrc
+
+```
+export GENPIPES_DEV_DIR=$HOME/some/dir/genpipes
+```
+
+Start the container with the normal procedure seen above. In the running container, execute the followin command:
+
+```
+ module load dev_genpipes
+```
+
+Voilà, now GenPipes uses whatever commmit of branch that has been checked out in $HOME/some/dir/genpipes
+
+
