@@ -1,15 +1,17 @@
-FROM centos:7
+FROM centos:7.5.1804
 MAINTAINER P-O Quirion po.quirion@computequebec.ca
 
 WORKDIR /tmp
 
 # All yum cmd
-RUN yum install -y  https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm \
+RUN yum install -y  https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-2-6.noarch.rpm \
   && yum install -y cvmfs.x86_64 wget unzip.x86_64 make.x86_64 gcc expectk dejagnu less tcl-devel.x86_64
 
 # parrot
-RUN wget http://ccl.cse.nd.edu/software/files/cctools-6.2.8-x86_64-redhat7.tar.gz \
-  && tar xvf cctools-6.2.8-x86_64-redhat7.tar.gz && mv cctools-6.2.8-x86_64-redhat7 /opt/. && rm cctools-6.2.8-x86_64-redhat7.tar.gz
+ENV CCTOOLS_VERSION 7.0.4
+RUN wget http://ccl.cse.nd.edu/software/files/cctools-${CCTOOLS_VERSION}-x86_64-redhat7.tar.gz \
+  && tar xvf cctools-${CCTOOLS_VERSION}-x86_64-redhat7.tar.gz && mv cctools-${CCTOOLS_VERSION}-x86_64-redhat7 /opt/cctools && rm cctools-${CCTOOLS_VERSION}-x86_64-redhat7.tar.gz
+
 ADD cvmfs-config.computecanada.ca.pub /etc/cvmfs/keys/.
 RUN chmod 4755 /bin/ping
 RUN mkdir /etc/parrot 

@@ -80,7 +80,7 @@ if [ $# -gt 0 ] ; then
 fi
   
 # copy the compute.canada config locally, this will let the other repo be mounted.
-/opt/cctools-6.2.8-x86_64-redhat7/bin/parrot_run cp -r /cvmfs/cvmfs-config.computecanada.ca /tmp/. 2>/dev/null
+/opt/cctools/bin/parrot_run cp -r /cvmfs/cvmfs-config.computecanada.ca /tmp/. 2>/dev/null
 
 CONFIG_PATH=/tmp/cvmfs-config.computecanada.ca/etc/cvmfs/config.d
 KEY_PATH=/tmp/cvmfs-config.computecanada.ca/etc/cvmfs/keys/mugqic
@@ -118,8 +118,8 @@ export PARROT_CVMFS_REPO="<default-repositories> \
 
 # load cvmfs 
 if [  ${genpipe_script}  ]; then
-  /opt/cctools-6.2.8-x86_64-redhat7/bin/parrot_run  bash --rcfile /usr/local/etc/genpiperc -ic ${genpipe_script}
+  /opt/cctools/bin/parrot_run  bash --rcfile /usr/local/etc/genpiperc -ic ${genpipe_script}
 else 
-  /opt/cctools-6.2.8-x86_64-redhat7/bin/parrot_run  bash --rcfile /usr/local/etc/genpiperc 
+  /opt/cctools/bin/parrot_run  bash --rcfile /usr/local/etc/genpiperc 
 fi
 
