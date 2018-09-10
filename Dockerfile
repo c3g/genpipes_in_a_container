@@ -8,9 +8,10 @@ RUN yum install -y  https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release
   && yum install -y cvmfs.x86_64 wget unzip.x86_64 make.x86_64 gcc expectk dejagnu less tcl-devel.x86_64
 
 # parrot
-ENV CCTOOLS_VERSION 7.0.4
-RUN wget http://ccl.cse.nd.edu/software/files/cctools-${CCTOOLS_VERSION}-x86_64-redhat7.tar.gz \
-  && tar xvf cctools-${CCTOOLS_VERSION}-x86_64-redhat7.tar.gz && mv cctools-${CCTOOLS_VERSION}-x86_64-redhat7 /opt/cctools && rm cctools-${CCTOOLS_VERSION}-x86_64-redhat7.tar.gz
+RUN wget https://ccl.cse.nd.edu/software/autobuild/commit/5b94c693/cctools-5b94c693-x86_64-redhat7.tar.gz && tar xvf cctools-5b94c693-x86_64-redhat7.tar.gz && mv cctools-5b94c693-x86_64-redhat7 /opt/cctools &&  rm cctools-5b94c693-x86_64-redhat7.tar.gz
+# ENV CCTOOLS_VERSION 7.0.4
+#RUN wget http://ccl.cse.nd.edu/software/files/cctools-${CCTOOLS_VERSION}-x86_64-redhat7.tar.gz \
+#  && tar xvf cctools-${CCTOOLS_VERSION}-x86_64-redhat7.tar.gz && mv cctools-${CCTOOLS_VERSION}-x86_64-redhat7 /opt/cctools && rm cctools-${CCTOOLS_VERSION}-x86_64-redhat7.tar.gz
 
 ADD cvmfs-config.computecanada.ca.pub /etc/cvmfs/keys/.
 RUN chmod 4755 /bin/ping
