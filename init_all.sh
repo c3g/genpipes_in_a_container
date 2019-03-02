@@ -40,13 +40,13 @@ while getopts ":a:d:c:p:V:" opt; do
       ;;
     c)
       echo "Using local cvmfs config path $OPTARG"
-      LOCAL_CONFIG_PATH=${OPTARG}
+      export LOCAL_CONFIG_PATH=${OPTARG}
       ;;
     p)
       MUGQIC_INSTALL_HOME=${OPTARG}
       ;;
     V)
-      PIPELINE_VERSION=/${OPTARG}
+      export PIPELINE_VERSION=/${OPTARG}
       ;;
     d)
       export GENPIPES_DEV_DIR=/${OPTARG}
