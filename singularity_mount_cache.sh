@@ -1,7 +1,7 @@
 #! /bin/bash
  args=$@
 if [ $# -lt 1 ]; then
-   args=/home/poq/container_cvmfs/cccg_genpipes-0.5.img
+   args=../c3genomics_genpipes-beta.img
 fi
 
 
