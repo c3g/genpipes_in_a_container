@@ -26,13 +26,13 @@ usage (){
   echo -e "\t      default: ${MUGQIC_INSTALL_HOME}"
   echo -e "\t-d  Set a path to a genpipes repo that can supersedes"
   echo -e "\t      the soft.mugqic repo's version (developer's mode)"
-  echo -e "\t-V    Genpipes version (if other then module default)"
+  echo -e "\t-V    Genpipes version (will default to latest release)"
   echo -e "\t-e  Execute specific command and exit"
   echo
 }
 
 
-while getopts ":a:d:c:p:" opt; do
+while getopts ":a:d:c:p:V:" opt; do
   case $opt in
     a)
       echo "Setting parrot alien cache to $OPTARG"
