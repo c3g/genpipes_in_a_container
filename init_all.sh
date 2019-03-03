@@ -12,7 +12,7 @@ export PARROT_CVMFS_REPO="${CVMFS_CONFIG_CC}"
 export HTTP_PROXY='DIRECT' 
 
 LOCAL_CONFIG_PATH=/etc/parrot
-export PARROT_CVMFS_ALIEN_CACHE=/cvmfs-cache/parrot
+PARROT_CVMFS_ALIEN_CACHE=/tmp/parrot.${UID}
 export MUGQIC_INSTALL_HOME=/cvmfs/soft.mugqic/CentOS6
 
 usage (){
@@ -36,7 +36,7 @@ while getopts ":a:d:c:p:V:" opt; do
   case $opt in
     a)
       echo "Setting parrot alien cache to $OPTARG"
-      PARROT_CVMFS_ALIEN_CACHE=${OPTARG}
+      export PARROT_CVMFS_ALIEN_CACHE=${OPTARG}
       ;;
     c)
       echo "Using local cvmfs config path $OPTARG"
@@ -66,6 +66,8 @@ while getopts ":a:d:c:p:V:" opt; do
       ;;
   esac
 done
+
+
 shift $((OPTIND-1))
 # move the execline to a script
 if [ $# -gt 0 ] ; then
