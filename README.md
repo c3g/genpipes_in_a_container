@@ -26,6 +26,11 @@ You can also [Read the genpipes documentation](https://bitbucket.org/mugqic/genp
 
 Here is [the project's Docker hub page](https://hub.docker.com/r/c3genomics/genpipes/)
 
+## What exactly is avalable in that container?
+
+The full tested and integrated C3G/MUGQIC software stack.
+[For more detailes: http://www.computationalgenomics.ca/cvmfs-modules/](http://www.computationalgenomics.ca/cvmfs-modules/)
+
 
 ## Setup a dev enviroment
 
