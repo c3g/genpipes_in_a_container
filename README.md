@@ -12,19 +12,19 @@ The [Genpipes](https://bitbucket.org/mugqic/genpipes/src/master/README.md) tools
 Then run with docker 
 ```
 #!bash
-docker run --privileged -v /tmp:/tmp --network host -it -w $PWD -v $HOME:$HOME --user $UID:$GROUPS -v /etc/group:/etc/group  -v /etc/passwd:/etc/passwd  [ -v < CACHE_ON_HOST >:/cvmfs-cache/ ] cccg/genpipes:<TAG>
+docker run --privileged -v /tmp:/tmp --network host -it -w $PWD -v $HOME:$HOME --user $UID:$GROUPS -v /etc/group:/etc/group  -v /etc/passwd:/etc/passwd  [ -v < CACHE_ON_HOST >:/cvmfs-cache/ ] c3genomics/genpipes:<TAG>
 ```
 
 or singularity
 ```
 #!bash
-singularity run [ -B < /HOST/CACHE/ >:/cvmfs-cache/  ] docker://cccg/genpipes:<TAG>
+singularity run [ -B < /HOST/CACHE/ >:/cvmfs-cache/  ] docker://c3genomics/genpipes:<TAG>
 ```
 
 
 You can also [Read the genpipes documentation](https://bitbucket.org/mugqic/genpipes)
 
-Here is [the project's Docker hub page](https://hub.docker.com/r/cccg/genpipes/)
+Here is [the project's Docker hub page](https://hub.docker.com/r/c3genomics/genpipes/)
 
 
 ## Setup a dev enviroment
