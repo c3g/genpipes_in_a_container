@@ -9,7 +9,7 @@ The [Genpipes](https://bitbucket.org/mugqic/genpipes/src/master/README.md) tools
  - [Docker](https://docs.docker.com/install/)
  - [Singularity](https://singularity.lbl.gov/index.html)
 
-Then run with docker 
+Then run with docker
 ```
 #!bash
 docker run --privileged -v /tmp:/tmp --network host -it -w $PWD -v $HOME:$HOME --user $UID:$GROUPS -v /etc/group:/etc/group  -v /etc/passwd:/etc/passwd  [ -v < CACHE_ON_HOST >:/cvmfs-cache/ ] c3genomics/genpipes:<TAG>
@@ -29,14 +29,14 @@ Here is [the project's Docker hub page](https://hub.docker.com/r/c3genomics/genp
 ## What exactly is avalable in that container?
 
 The full tested and integrated C3G/MUGQIC software stack.
-[For more detailes: http://www.computationalgenomics.ca/cvmfs-modules/](http://www.computationalgenomics.ca/cvmfs-modules/)
+[For more details: http://www.computationalgenomics.ca/cvmfs-modules/](http://www.computationalgenomics.ca/cvmfs-modules/)
 
 
 ## Setup a dev enviroment
 
 You can use this container to develop and test new version of GenPipes.
 
-Fist, clone genpipe somewhere under your $HOME folder three. 
+Fist, clone genpipe somewhere under your $HOME folder three.
 
 ```
 git clone https://bitbucket.org/mugqic/genpipes $HOME/some/dir/genpipes
@@ -54,5 +54,3 @@ Start the container with the normal procedure seen above. In the running contain
 ```
 
 Voilà, now GenPipes uses whatever commmit of branch that has been checked out in $HOME/some/dir/genpipes
-
-
