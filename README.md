@@ -12,13 +12,13 @@ The [Genpipes](https://bitbucket.org/mugqic/genpipes/src/master/README.md) tools
 Then run with docker
 ```
 #!bash
-docker run --privileged -v /tmp:/tmp --network host -it -w $PWD -v $HOME:$HOME --user $UID:$GROUPS -v /etc/group:/etc/group  -v /etc/passwd:/etc/passwd  [ -v < CACHE_ON_HOST >:/cvmfs-cache/ ] c3genomics/genpipes:<TAG>
+docker run --privileged -v /tmp:/tmp --network host -it -w $PWD -v $HOME:$HOME --user $UID:$GROUPS -v /etc/group:/etc/group  -v /etc/passwd:/etc/passwd  c3genomics/genpipes:<TAG>
 ```
 
 or singularity
 ```
 #!bash
-singularity run [ -B < /HOST/CACHE/ >:/cvmfs-cache/  ] docker://c3genomics/genpipes:<TAG>
+singularity run docker://c3genomics/genpipes:<TAG>
 ```
 
 
