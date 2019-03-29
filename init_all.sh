@@ -7,6 +7,7 @@
 
 export PARROT_ALLOW_SWITCHING_CVMFS_REPOSITORIES=yes
 CVMFS_CONFIG_CC=cvmfs-config.computecanada.ca:url=cvmfs-s1-east.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub
+
 export PARROT_CVMFS_REPO="${CVMFS_CONFIG_CC}"
 #export HTTP_PROXY='http://gr-1r15-n01:3130;DIRECT' 
 export HTTP_PROXY='DIRECT' 
@@ -14,6 +15,8 @@ export HTTP_PROXY='DIRECT'
 LOCAL_CONFIG_PATH=/etc/parrot
 PARROT_CVMFS_ALIEN_CACHE=/tmp/parrot.${UID}
 export MUGQIC_INSTALL_HOME=/cvmfs/soft.mugqic/CentOS6
+
+export QUIET=''
 
 usage (){
   echo -e "\nUsage: $0 [-c <PATH>] [-a <PATH>] [-p <PATH> ] [ -d <PATH> ] [-V <X.X.X> ] [ <cmd> ] " 1>&2;
@@ -32,7 +35,7 @@ usage (){
 }
 
 
-while getopts ":a:d:c:p:V:" opt; do
+while getopts ":a:d:c:p:qV:" opt; do
   case $opt in
     a)
       echo "Setting parrot alien cache to $OPTARG"
@@ -44,6 +47,9 @@ while getopts ":a:d:c:p:V:" opt; do
       ;;
     p)
       MUGQIC_INSTALL_HOME=${OPTARG}
+      ;;
+    q)
+      export QUIET="-d clear"
       ;;
     V)
       export PIPELINE_VERSION=/${OPTARG}
@@ -82,7 +88,7 @@ if [ $# -gt 0 ] ; then
 fi
   
 # copy the compute.canada config locally, this will let the other repo be mounted.
-/opt/cctools/bin/parrot_run cp -r /cvmfs/cvmfs-config.computecanada.ca /tmp/. 2>/dev/null
+/opt/cctools/bin/parrot_run $QUIET cp -r /cvmfs/cvmfs-config.computecanada.ca /tmp/. 2>/dev/null
 
 CONFIG_PATH=/tmp/cvmfs-config.computecanada.ca/etc/cvmfs/config.d
 KEY_PATH=/tmp/cvmfs-config.computecanada.ca/etc/cvmfs/keys/mugqic
@@ -120,8 +126,8 @@ export PARROT_CVMFS_REPO="<default-repositories> \
 
 # load cvmfs 
 if [  ${genpipe_script}  ]; then
-  /opt/cctools/bin/parrot_run  bash --rcfile /usr/local/etc/genpiperc -ic ${genpipe_script}
+  /opt/cctools/bin/parrot_run $QUIET bash --rcfile /usr/local/etc/genpiperc -ic ${genpipe_script}
 else 
-  /opt/cctools/bin/parrot_run  bash --rcfile /usr/local/etc/genpiperc 
+  /opt/cctools/bin/parrot_run $QUIET bash --rcfile /usr/local/etc/genpiperc 
 fi
 
