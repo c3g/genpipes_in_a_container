@@ -6,7 +6,7 @@
 # It also loads the lmod software to load mugqic modules 
 
 export PARROT_ALLOW_SWITCHING_CVMFS_REPOSITORIES=yes
-CVMFS_CONFIG_CC=cvmfs-s1-beluga.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub;cvmfs-s1-arbutus.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub;http://cvmfs-s1-east.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub
+CVMFS_CONFIG_CC="cvmfs-s1-beluga.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub;cvmfs-s1-arbutus.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub;cvmfs-s1-east.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub"
 export PARROT_CVMFS_REPO="${CVMFS_CONFIG_CC}"
 export HTTP_PROXY='DIRECT' 
 
@@ -14,7 +14,6 @@ LOCAL_CONFIG_PATH=/etc/parrot
 PARROT_CVMFS_ALIEN_CACHE=/tmp/parrot.${UID}
 export MUGQIC_INSTALL_HOME=/cvmfs/soft.mugqic/CentOS6
 
-export QUIET=''
 
 usage (){
   echo -e "\nUsage: $0 [-c <PATH>] [-a <PATH>] [-p <PATH> ] [ -d <PATH> ] [-V <X.X.X> ] [ <cmd> ] " 1>&2;
@@ -29,12 +28,13 @@ usage (){
   echo -e "\t      the soft.mugqic repo's version (developer's mode)"
   echo -e "\t-V    Genpipes version (will default to latest release)"
   echo -e "\t-e  Execute specific command and exit"
-  echo -e "\t-q  keep the parrot quiet"
+  echo -e "\t-v  vebose mode, makes the parrot talk"
   echo
 }
 
+export QUIET="-d clear"
 
-while getopts ":a:d:c:p:qV:" opt; do
+while getopts ":a:d:c:p:vV:" opt; do
   case $opt in
     a)
       echo "Setting parrot alien cache to $OPTARG"
@@ -47,8 +47,8 @@ while getopts ":a:d:c:p:qV:" opt; do
     p)
       MUGQIC_INSTALL_HOME=${OPTARG}
       ;;
-    q)
-      export QUIET="-d clear"
+    v)
+      unset QUIET
       ;;
     V)
       export PIPELINE_VERSION=/${OPTARG}
@@ -76,7 +76,6 @@ done
 shift $((OPTIND-1))
 # move the execline to a script
 if [ $# -gt 0 ] ; then
- echo $#
   function finish {
     rm ${genpipe_script}
   }

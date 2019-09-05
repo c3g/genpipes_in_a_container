@@ -1,5 +1,5 @@
-source /etc/bashrc
-source ~/.bashrc
+#source /etc/bashrc
+#source ~/.bashrc
 if [ -z "${QUIET}" ]; then
 echo -e "\nWait while Genpipes module are loaded. This could take a while,"
 echo -e   "  especially if the cvmfs cache is new\n"
