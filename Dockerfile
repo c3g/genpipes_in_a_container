@@ -19,11 +19,11 @@ RUN wget http://ccl.cse.nd.edu/software/files/cctools-${CCTOOLS_VERSION}-x86_64-
   && tar xvf cctools-${CCTOOLS_VERSION}-x86_64-centos7.tar.gz && mv cctools-${CCTOOLS_VERSION}-x86_64-centos7 \
   /opt/cctools && rm cctools-${CCTOOLS_VERSION}-x86_64-centos7.tar.gz
 
-ADD cvmfs-config.computecanada.ca.pub /etc/cvmfs/keys/.
+RUN mkdir /etc/parrot
+ADD keys /etc/parrot/keys
 RUN chmod 4755 /bin/ping
-RUN mkdir /etc/parrot 
 # adding local config to containe. These will overwrite the cvmfs-config.computecanada ones
-ADD config.d /etc/parrot/.
+ADD config.d /etc/parrot/config.d
 RUN mkdir /cvmfs-cache && chmod 777 /cvmfs-cache
 
 # module

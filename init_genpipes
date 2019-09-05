@@ -6,9 +6,7 @@
 # It also loads the lmod software to load mugqic modules 
 
 export PARROT_ALLOW_SWITCHING_CVMFS_REPOSITORIES=yes
-CVMFS_CONFIG_CC="cvmfs-s1-beluga.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub;cvmfs-s1-arbutus.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub;cvmfs-s1-east.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub"
-export PARROT_CVMFS_REPO="${CVMFS_CONFIG_CC}"
-export HTTP_PROXY='DIRECT' 
+export HTTP_PROXY='DIRECT'
 
 LOCAL_CONFIG_PATH=/etc/parrot
 PARROT_CVMFS_ALIEN_CACHE=/tmp/parrot.${UID}
@@ -84,12 +82,9 @@ if [ $# -gt 0 ] ; then
   chmod 755 ${genpipe_script}
   echo $@ > ${genpipe_script}
 fi
-  
-# copy the compute.canada config locally, this will let the other repo be mounted.
-/opt/cctools/bin/parrot_run $QUIET cp -r /cvmfs/cvmfs-config.computecanada.ca /tmp/. 2>/dev/null
 
-CONFIG_PATH=/tmp/cvmfs-config.computecanada.ca/etc/cvmfs/config.d
-KEY_PATH=/tmp/cvmfs-config.computecanada.ca/etc/cvmfs/keys/mugqic
+CONFIG_PATH=/etc/parrot/config.d
+KEY_PATH=/etc/parrot/keys
 
 cvmfs_to_parrot() {
   repo_name=$1 
