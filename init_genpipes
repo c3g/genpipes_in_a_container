@@ -6,10 +6,8 @@
 # It also loads the lmod software to load mugqic modules 
 
 export PARROT_ALLOW_SWITCHING_CVMFS_REPOSITORIES=yes
-CVMFS_CONFIG_CC=cvmfs-config.computecanada.ca:url=cvmfs-s1-east.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub
-
+CVMFS_CONFIG_CC=cvmfs-s1-beluga.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub;cvmfs-s1-arbutus.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub;http://cvmfs-s1-east.computecanada.ca:8000/cvmfs/cvmfs-config.computecanada.ca,pubkey=/etc/cvmfs/keys/cvmfs-config.computecanada.ca.pub
 export PARROT_CVMFS_REPO="${CVMFS_CONFIG_CC}"
-#export HTTP_PROXY='http://gr-1r15-n01:3130;DIRECT' 
 export HTTP_PROXY='DIRECT' 
 
 LOCAL_CONFIG_PATH=/etc/parrot
@@ -31,6 +29,7 @@ usage (){
   echo -e "\t      the soft.mugqic repo's version (developer's mode)"
   echo -e "\t-V    Genpipes version (will default to latest release)"
   echo -e "\t-e  Execute specific command and exit"
+  echo -e "\t-q  keep the parrot quiet"
   echo
 }
 
@@ -124,10 +123,10 @@ export PARROT_CVMFS_REPO="<default-repositories> \
 	ref.mugqic:url=$ref_url,pubkey=$KEY_PATH/ref.mugqic.pub,try_local_filesystem"
 
 
-# load cvmfs 
+# load cvmfs
 if [  ${genpipe_script}  ]; then
-  /opt/cctools/bin/parrot_run $QUIET bash --rcfile /usr/local/etc/genpiperc -ic ${genpipe_script}
-else 
-  /opt/cctools/bin/parrot_run $QUIET bash --rcfile /usr/local/etc/genpiperc 
+  /opt/cctools/bin/parrot_run $QUIET --no-set-foreground bash  -lc ${genpipe_script}
+else
+   /opt/cctools/bin/parrot_run $QUIET bash -il
 fi
 
