@@ -39,12 +39,13 @@ You can use this container to develop and test new version of GenPipes.
 Fist, clone genpipe somewhere under your $HOME folder three.
 
 ```
-git clone https://bitbucket.org/mugqic/genpipes $HOME/some/dir/genpipes
+git clone https://bitbucket.org/mugqic/genpipes $WORKDIR/genpipes
 ```
-Add the followin line to your .bashrc
+Add that path with the `-d` option
 
 ```
-export GENPIPES_DEV_DIR=$HOME/some/dir/genpipes
+singularity run docker://c3genomics/genpipes:$TAG -d $HOME/some/dir/genpipes
+
 ```
 
 Start the container with the normal procedure seen above. In the running container, execute the followin command:
