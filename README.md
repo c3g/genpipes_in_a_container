@@ -32,11 +32,11 @@ The full tested and integrated C3G/MUGQIC software stack.
 [For more details: http://www.computationalgenomics.ca/cvmfs-modules/](http://www.computationalgenomics.ca/cvmfs-modules/)
 
 
-## Setup a dev enviroment
+## Setup a dev environment
 
 You can use this container to develop and test new version of GenPipes.
 
-Fist, clone genpipe somewhere under your $HOME folder three.
+Fist, clone genpipes somewhere under your $HOME folder three.
 
 ```
 git clone https://bitbucket.org/mugqic/genpipes $WORKDIR/genpipes
@@ -44,14 +44,20 @@ git clone https://bitbucket.org/mugqic/genpipes $WORKDIR/genpipes
 Add that path with the `-d` option
 
 ```
-singularity run docker://c3genomics/genpipes:$TAG -d $HOME/some/dir/genpipes
+singularity run docker://c3genomics/genpipes:$TAG -d $WORKDIR/genpipes
 
 ```
 
-Start the container with the normal procedure seen above. In the running container, execute the followin command:
+Start the container with the normal procedure seen above. In the running container, execute the following command:
 
 ```
  module load dev_genpipes
 ```
+Voilà, now GenPipes uses whatever commmit of branch that has been checked out in $WORKDIR/genpipes
 
-Voilà, now GenPipes uses whatever commmit of branch that has been checked out in $HOME/some/dir/genpipes
+#Note 
+
+File that starts with cvmfschecksum.* are created in $PWD when running the container. 
+These files are armless and link to a bug in one of genpipe_in_a_container dependencies. They can be deleted.
+
+
