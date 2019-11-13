@@ -5,46 +5,24 @@
 # http://cvmfs.readthedocs.io/en/stable/cpt-configure.html#parrot-connector-to-cernvm-fs
 # It also loads the lmod software to load mugqic modules 
 
-export PARROT_ALLOW_SWITCHING_CVMFS_REPOSITORIES=yes
-export HTTP_PROXY='DIRECT'
 
-LOCAL_CONFIG_PATH=/etc/parrot
-PARROT_CVMFS_ALIEN_CACHE=/tmp/parrot.${UID}
 export MUGQIC_INSTALL_HOME=/cvmfs/soft.mugqic/CentOS6
 
 
 usage (){
-  echo -e "\nUsage: $0 [-c <PATH>] [-a <PATH>] [-p <PATH> ] [ -d <PATH> ] [-V <X.X.X> ] [ <cmd> ] " 1>&2;
+  echo -e "\nUsage: $0  [ -d <PATH> ] [-V <X.X.X> ] [ <cmd> ] " 1>&2;
   echo -e "\nOPTION"
-  echo -e "\t-a  Set the path of the cache use to store cvmfs data"
-  echo -e "\t      default: ${PARROT_CVMFS_ALIEN_CACHE}"
-  echo -e "\t-c  Set the path for local cvmfs repo config"
-  echo -e "\t      default: ${LOCAL_CONFIG_PATH}"
-  echo -e "\t-p  Set the path for the mugqic software stack"
-  echo -e "\t      default: ${MUGQIC_INSTALL_HOME}"
   echo -e "\t-d  Set a path to a genpipes repo that can supersedes"
   echo -e "\t      the soft.mugqic repo's version (developer's mode)"
   echo -e "\t-V    Genpipes version (will default to latest release)"
-  echo -e "\t-e  Execute specific command and exit"
   echo -e "\t-v  vebose mode, makes the parrot talk"
   echo
 }
 
 export QUIET="-d clear"
 
-while getopts ":a:d:c:p:vV:" opt; do
+while getopts ":d:vV:h" opt; do
   case $opt in
-    a)
-      echo "Setting parrot alien cache to $OPTARG"
-      export PARROT_CVMFS_ALIEN_CACHE=${OPTARG}
-      ;;
-    c)
-      echo "Using local cvmfs config path $OPTARG"
-      export LOCAL_CONFIG_PATH=${OPTARG}
-      ;;
-    p)
-      MUGQIC_INSTALL_HOME=${OPTARG}
-      ;;
     v)
       unset QUIET
       ;;
@@ -72,7 +50,7 @@ done
 
 
 shift $((OPTIND-1))
-# move the execline to a script
+# move the exec line to a script
 if [ $# -gt 0 ] ; then
   function finish {
     rm ${genpipe_script}
@@ -80,47 +58,16 @@ if [ $# -gt 0 ] ; then
   genpipe_script=$(mktemp /tmp/genpipe_script.XXXXXX)
   trap finish EXIT
   chmod 755 ${genpipe_script}
-  echo $@ > ${genpipe_script}
+  echo echo '#!' > ${genpipe_script}
+  echo "$@" >> ${genpipe_script}
 fi
 
-CONFIG_PATH=/etc/parrot/config.d
-KEY_PATH=/etc/parrot/keys
-
-cvmfs_to_parrot() {
-  repo_name=$1 
-  # Get the CC config 
-  source ${CONFIG_PATH}/${repo_name}.conf
-  # Load the local config
-  source ${LOCAL_CONFIG_PATH}/${repo_name}.conf 2> /dev/null
-  local ref_url=${CVMFS_SERVER_URL=}
-  local ref_url=${CVMFS_SERVER_URL//@fqrn@/$repo_name}
-  local ref_url=${CVMFS_SERVER_URL//@fqrn@/$repo_name}
-  
-  local ref_key=${CVMFS_KEYS_DIR:-$KEY_PATH}
-  local ref_key=$(echo "${ref_key}" | sed 's|^/cvmfs|/tmp|')
-
-  echo $ref_url $ref_key
-
-}
-
-# Reading the statum connection, 
-# could be loccally overwritten to optimise connections
-read ref_url ref_key < <(cvmfs_to_parrot  ref.mugqic)
-read soft_url soft_key < <(cvmfs_to_parrot  soft.mugqic)
-
-# The <default-repositories> option is important when cvmfs repo are 
-# already present in the cvmfs directory. Parrot will not try to remount
-# the fs in that case.
-export PARROT_CVMFS_REPO="<default-repositories> \
-	${CVMFS_CONFIG_CC} \
-	soft.mugqic:url=$soft_url,pubkey=$KEY_PATH/soft.mugqic.pub,try_local_filesystem \
-	ref.mugqic:url=$ref_url,pubkey=$KEY_PATH/ref.mugqic.pub,try_local_filesystem"
 
 
 # load cvmfs
 if [  ${genpipe_script}  ]; then
-  /opt/cctools/bin/parrot_run $QUIET --no-set-foreground bash  -lc ${genpipe_script}
+  bash -ilc "${genpipe_script}"
 else
-   /opt/cctools/bin/parrot_run $QUIET bash -il
+  bash -il
 fi
 
