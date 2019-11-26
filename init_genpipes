@@ -58,7 +58,7 @@ if [ $# -gt 0 ] ; then
   genpipe_script=$(mktemp /tmp/genpipe_script.XXXXXX)
   trap finish EXIT
   chmod 755 ${genpipe_script}
-  echo echo '#!' > ${genpipe_script}
+  echo '#! /bin/bash' >> ${genpipe_script}
   echo "$@" >> ${genpipe_script}
 fi
 
