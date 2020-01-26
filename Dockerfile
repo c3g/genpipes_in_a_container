@@ -11,6 +11,7 @@ ENV MODULE_VERSION 4.1.2
 RUN yum update -y \
   && yum install -y wget unzip.x86_64 make.x86_64 gcc expectk dejagnu less tcl-devel.x86_64 \
   && yum clean all
+RUN install fuse
 
 RUN mkdir /cvmfs-cache  /cvmfs  && chmod 777 /cvmfs-cache  /cvmfs
 
