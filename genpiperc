@@ -1,10 +1,15 @@
 #source /etc/bashrc
 #source ~/.bashrc
-if [ -z "${QUIET}" ]; then
+if [ -z "${QUIET+x}" ]; then
 echo -e "\nWait while Genpipes module are loaded. This could take a while,"
 echo -e   "  especially if the cvmfs cache is new\n"
 fi
 module use $MUGQIC_INSTALL_HOME/modulefiles
 module load mugqic/python/2.7.14
-module load mugqic/genpipes${PIPELINE_VERSION}
 
+if [ -z "${GENPIPES_DEV_DIR+x}" ]; then
+    module load mugqic/genpipes${PIPELINE_VERSION}
+else
+    module use /usr/local/Modules/modulefiles
+    module load dev_genpipes
+fi

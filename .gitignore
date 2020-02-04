@@ -1,2 +1,3 @@
 cvmfschecksum.*
 *_mount_cache.sh
+singularity/wrapper_genpipes/images
