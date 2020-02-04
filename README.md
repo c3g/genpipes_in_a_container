@@ -7,9 +7,7 @@ If FUSE and [Singularity](https://singularity.lbl.gov/index.html) is installed o
 While you can use (GiaC) to debug and develop Genpipes on you machine on you machine, [Genpipes](https://bitbucket.org/mugqic/genpipes/src/master/README.md) is design to run analysis on Super Computers.  
 
 
-
 ## Install a compatible container technology on your machine
-
 Follow installation procedure from te  [Singularity install page](https://sylabs.io/guides/3.5/admin-guide/installation.html)
 
 
