@@ -7,7 +7,7 @@ WORKDIR /tmp
 
 ENV CCTOOLS_VERSION 7.0.16
 ENV CVMFS_VERSION latest
-ENV MODULE_VERSION 4.1.2
+ENV MODULE_VERSION 3.2.10
 RUN yum update -y \
   && yum install -y wget unzip.x86_64 make.x86_64 gcc expectk dejagnu less tcl-devel.x86_64 \
   && yum clean all
@@ -15,12 +15,12 @@ RUN yum update -y \
 RUN mkdir /cvmfs-cache  /cvmfs  && chmod 777 /cvmfs-cache  /cvmfs
 
 # module
-RUN wget https://github.com/cea-hpc/modules/releases/download/v${MODULE_VERSION}/modules-${MODULE_VERSION}.tar.gz
+RUN wget https://sourceforge.net/projects/modules/files/Modules/modules-${MODULE_VERSION}/modules-${MODULE_VERSION}.tar.gz
 RUN tar xzf modules-${MODULE_VERSION}.tar.gz && \
     rm modules-${MODULE_VERSION}.tar.gz \
     && cd  modules-${MODULE_VERSION}  && ./configure && make -j 7  && make install \
     && cd .. && rm -rf modules-${MODULE_VERSION} && rm -rf /usr/local/Modules/modulefiles/*
-RUN ["ln", "-s", "/usr/local/Modules/init/profile.sh", "/etc/profile.d/z00_module.sh"]
+RUN ln -s /usr/local/Modules/${MODULE_VERSION}/init/bash /etc/profile.d/z00_module.sh 
 #RUN echo "source /etc/profile.d/z00_module.sh" >>  /etc/bashrc
 ADD devmodule/genpipes "/usr/local/Modules/modulefiles/."
 
