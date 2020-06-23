@@ -86,13 +86,32 @@ Docker and fuse need to be installed on you system.
 
 ```
 # pull the latest docker image
-docker c3genomics/genpipes:latest
+docker pull c3genomics/genpipes:latest
 # run Docker with the right options
-# create a folder where the caching will happen
-mkdir $HOME/cvmfs_cache
+# create a folder where the caching will happen It need to be accessible by the
+# cvmfs user inside the container
+mkdir  $HOME/cvmfs_cache &&  chmod 777  $HOME/cvmfs_cache
 # run the container
-docker run --rm  --security-opt apparmor:unconfined   --device /dev/fuse --cap-add SYS_ADMIN  -v /tmp:/tmp --network host -it -w $PWD -v $HOME:$HOME --user $UID:$GROUPS -v /etc/group:/etc/group  -v /etc/passwd:/etc/passwd  -v $HOME/cvmfs_cache:/cvmfs-cache/ c3genomics/genpipes
+docker run --rm  --security-opt apparmor:unconfined   --device /dev/fuse --cap-add SYS_ADMIN  -v /tmp:/tmp -it -w $PWD -v $HOME:$HOME -v /etc/group:/etc/group  -v /etc/passwd:/etc/passwd  -v $HOME/cvmfs_cache/:/cvmfs-cache/ c3genomics/genpipes
 ```
+```
+# here are the logs you will see
+CernVM-FS: running with credentials 999:997 # this is the user that needs access to the cache
+CernVM-FS: loading Fuse module... done
+CernVM-FS: mounted cvmfs on /cvmfs/ref.mugqic
+CernVM-FS: running with credentials 999:997
+CernVM-FS: loading Fuse module... done
+CernVM-FS: mounted cvmfs on /cvmfs/soft.mugqic
+# you are in the container now.
+```
+Then check that all is in place
+```
+module avail
+dnaseq.py -h
+```
+The first time a command is ran it will take time to complete since the cache
+needs to be built. The second time, it should be instantaneous.
+
 ### Trouble shooting
 To be able to run the docker container with the host uid, fuse need to be
 accessible to non root user.
