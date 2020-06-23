@@ -37,7 +37,7 @@ ADD devmodule/genpipes "/usr/local/Modules/modulefiles/."
 #RUN echo "source /etc/profile.d/z90_genpipes.sh" >>  /etc/bashrc
 RUN ["ln", "-s", "/usr/local/etc/genpiperc", "/etc/profile.d/z90_genpipes.sh"]
 
-ADD genpiperc    /usr/local/etc/genpiperc
+ADD docker/genpiperc    /usr/local/etc/genpiperc
 ADD init_genpipes /usr/local/bin/init_genpipes
 RUN chmod 755 /usr/local/bin/init_genpipes
 
