@@ -82,7 +82,7 @@ Right now the docker version has only been tested on a single machine mode.
 
 
 ## Use Genpipes inside a Docker container
-Docker and fuse need to be installed on you system.
+Docker and fuse need to be installed on your system.
 
 ```
 # pull the latest docker image
@@ -113,8 +113,9 @@ The first time a command is ran it will take time to complete since the cache
 needs to be built. The second time, it should be instantaneous.
 
 ### Trouble shooting
-To be able to run the docker container with the host uid, fuse need to be
+To be able to run the docker container, fuse needs to be
 accessible to non root user.
+
 This is good
 ```
 $ ls -l  /dev/fuse
