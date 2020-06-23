@@ -1,3 +1,4 @@
 cvmfschecksum.*
 *_mount_cache.sh
 singularity/wrapper_genpipes/images
+singularity/wrapper_genpipes.tgz
