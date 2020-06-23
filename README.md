@@ -1,4 +1,4 @@
-# Genpipes container
+# Genpipes container Singularity.
 
 You can use Genpipes in a Container (GiaC) to run Genpipes on a single machine, on a a Torque/PBS cluster or on a SLURM cluster.
 
@@ -23,7 +23,7 @@ The full tested and integrated C3G/MUGQIC software stack.
 
 You can use this container to develop and test new version of GenPipes.
 
-Fist, clone genpipes somewhere under your $HOME folder three. Then get the container wrapper:
+Fist, clone Genpipes somewhere under your $HOME folder three. Then get the container wrapper:
 
 ```
 git clone https://bitbucket.org/mugqic/genpipes $WORKDIR/genpipes
@@ -55,21 +55,60 @@ You do not need any other setup on your machine.
 
 ## PIPELINE USAGE
 
-# On SLURM HPC
+### On SLURM HPC
 
 Created an ini file that fits your system and for the pipeline(s) you want to use.
 
 
-add the `--wrap` option when running the pipelines
+add the `--wrap` option when running the pipelines creation command.
 
-# On PBS/torque flavored HPC
+### On PBS/torque flavored HPC
 
 Created an ini file that fits your system and for the pipeline(s) you want to use.
 
-add the `--wrap` option when running the pipelines
+add the `--wrap` option when running the pipelines  creation command.
 
 
-# On a single machine.
-
+### On a single machine.
 
 Just run the pipeline with the `--wrap` and `-j batch` and `--no-json` options!
+
+# Genpipes container Docker
+
+The full setup is more simple with docker, but you need to be allowed to be
+an administrator to install and run it.
+
+Right now the docker version has only been tested on a single machine mode.
+
+
+## Use Genpipes inside a Docker container
+Docker and fuse need to be installed on you system.
+
+```
+# pull the latest docker image
+docker c3genomics/genpipes:latest
+# run Docker with the right options
+# create a folder where the caching will happen
+mkdir $HOME/cvmfs_cache
+# run the container
+docker run --rm  --security-opt apparmor:unconfined   --device /dev/fuse --cap-add SYS_ADMIN  -v /tmp:/tmp --network host -it -w $PWD -v $HOME:$HOME --user $UID:$GROUPS -v /etc/group:/etc/group  -v /etc/passwd:/etc/passwd  -v $HOME/cvmfs_cache:/cvmfs-cache/ c3genomics/genpipes
+```
+### Trouble shooting
+To be able to run the docker container with the host uid, fuse need to be
+accessible to non root user.
+This is good
+```
+$ ls -l  /dev/fuse
+crw-rw-rw- 1 root root 10, 229 Jun 19 11:49 /dev/fuse
+```
+This would be bad
+```
+$ ls -l  /dev/fuse
+crw-rw---- 1 root root 10, 229 Jun 19 11:49 /dev/fuse
+```
+To solve that problem, you can open access to the fuse device:
+
+```
+chmod 666 /dev/fuse
+```
+or run the container as root (well the other option is better!)
