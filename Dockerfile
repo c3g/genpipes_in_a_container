@@ -10,7 +10,7 @@ ENV CVMFS_VERSION latest
 ENV MODULE_VERSION 4.1.2
 RUN yum install -y https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm
 RUN yum update -y \
-  && yum install -y wget unzip.x86_64 make.x86_64 gcc expectk \
+  && yum install -y which wget unzip.x86_64 make.x86_64 gcc expectk \
   dejagnu less tcl-devel.x86_64 \
   cvmfs cvmfs-config-default \
   && yum clean all

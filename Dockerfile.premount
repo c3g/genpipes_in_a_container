@@ -9,7 +9,7 @@ ENV CCTOOLS_VERSION 7.0.16
 ENV CVMFS_VERSION latest
 ENV MODULE_VERSION 3.2.10
 RUN yum update -y \
-  && yum install -y wget unzip.x86_64 make.x86_64 gcc expectk dejagnu less tcl-devel.x86_64 \
+  && yum install -y which wget unzip.x86_64 make.x86_64 gcc expectk dejagnu less tcl-devel.x86_64 \
   && yum clean all
 
 RUN mkdir /cvmfs-cache  /cvmfs  && chmod 777 /cvmfs-cache  /cvmfs
@@ -32,5 +32,5 @@ ADD init_genpipes /usr/local/bin/init_genpipes
 RUN chmod 755 /usr/local/bin/init_genpipes
 
 ENTRYPOINT ["init_genpipes"]
-# docker build --tag c3genomics/genpipes:beta .
+# docker build --tag c3genomics/genpipes:beta -f Dockerfile.premount . && singularity build genpipes.sif docker-daemon://c3genomics/genpipes:beta
 
