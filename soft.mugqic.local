@@ -1,0 +1,3 @@
+#CVMFS_PUBLIC_KEY=/cvmfs/cvmfs-config.computecanada.ca/etc/cvmfs/keys/mugqic/soft.mugqic.pub
+CVMFS_FALLBACK_PROXY=
+CVMFS_HTTP_PROXY="DIRECT"
