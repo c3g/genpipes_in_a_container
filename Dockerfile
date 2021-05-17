@@ -1,4 +1,4 @@
-FROM davedykstra/cvmfs-fuse3
+FROM centos:7.9.2009
 MAINTAINER P-O Quirion po.quirion@mcgill.ca
 
 WORKDIR /tmp
@@ -7,15 +7,15 @@ WORKDIR /tmp
 
 ENV CVMFS_VERSION latest
 ENV MODULE_VERSION 4.1.2
-#RUN yum install -y https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm https://package.computecanada.ca/yum/cc-cvmfs-public/prod/RPM/computecanada-release-latest.noarch.rpm
+RUN yum install -y https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm https://package.computecanada.ca/yum/cc-cvmfs-public/prod/RPM/computecanada-release-latest.noarch.rpm
 RUN yum update -y \
   && yum install -y which wget unzip.x86_64 make.x86_64 gcc expectk \
-  dejagnu less tcl-devel.x86_64 \
+  dejagnu less tcl-devel.x86_64 cvmfs-config-computecanada \
   cvmfs-fuse3 cvmfs-config-default \
   && yum clean all
-RUN yum install -y https://package.computecanada.ca/yum/cc-cvmfs-public/prod/RPM/computecanada-release-latest.noarch.rpm
-RUN yum update -y \
-   && yum install -y  cvmfs-config-computecanada
+# RUN yum install -y https://package.computecanada.ca/yum/cc-cvmfs-public/prod/RPM/computecanada-release-latest.noarch.rpm
+# RUN yum update -y \
+   # && yum install -y  cvmfs-config-computecanada
 
 RUN mkdir /cvmfs-cache  && chmod 777 /cvmfs-cache  /cvmfs
 
