@@ -1,7 +1,7 @@
-CVMFS_REPOSITORIES="ref.mugqic,soft.mugqic"
+
+CVMFS_REPOSITORIES="cvmfs-config.computecanada.ca"
 CVMFS_QUOTA_LIMIT='44500'
 CVMFS_SHARED_CACHE=no
-CVMFS_SERVER_URL="http://cvmfs-1-west-c3g.computecanada.ca:8000/cvmfs/@fqrn@;http://cvmfs-s0-genomic.vhost38.genap.ca/cvmfs/@fqrn@"
 CVMFS_HTTP_PROXY=DIRECT
-CVMFS_ALIEN_CACHE="/cvmfs-cache/@fqrn@"
-CVMFS_QUOTA_LIMIT='-1'
+CVMFS_STRICT_MOUNT="yes"
+CVMFS_SERVER_URL="cvmfs-s1-arbutus.computecanada.ca:8000/cvmfs/@fqrn@,cvmfs-s1-beluga.computecanada.ca:8000/cvmfs/@fqrn@,cvmfs-s1-east.computecanada.ca,cvmfs-s1.computecanada.net:80/cvmfs/@fqrn@"
