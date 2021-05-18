@@ -1,0 +1,26 @@
+#source /etc/bashrc
+#source ~/.bashrc
+if [ -z "${QUIET+x}" ]; then
+echo -e "\nWait while Genpipes module are loaded. This could take a while,"
+echo -e   "  especially if the cvmfs cache is new\n"
+fi
+
+mount -l  | grep soft.mugqic 2>/dev/null 1>&2
+retcode=$?
+if [ ${retcode} -ne 0 ] ; then
+   # should only run in docker container, not singularity
+   mount -t cvmfs cvmfs-config.computecanada.ca /cvmfs/cvmfs-config-computecanada.ca/
+   mount -t cvmfs ref.mugqic /cvmfs/ref.mugqic
+   mount -t cvmfs soft.mugqic /cvmfs/soft.mugqic
+fi
+
+
+module use $MUGQIC_INSTALL_HOME/modulefiles
+module load mugqic/python/2.7.14
+
+if [ -z "${GENPIPES_DEV_DIR+x}" ]; then
+    module load mugqic/genpipes${PIPELINE_VERSION}
+else
+    module use /usr/local/Modules/modulefiles
+    module load dev_genpipes
+fi
