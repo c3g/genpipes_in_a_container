@@ -1,8 +1,8 @@
 #! /bin/bash
  args=$@
 if [ $# -lt 1 ]; then
-   args=../c3genomics_genpipes-beta.img
+   args=../genpipes_centos7.sif
 fi
 
 
-singularity run -B /media/caches/:/cvmfs-cache/ $args
+singularity run  -S /var/run/cvmfs -B ~/cvmfs_cache:/cvmfs-cache --fusemount "container:cvmfs2 cvmfs-config.computecanada.ca /cvmfs/cvmfs-config.computecanada.ca"    --fusemount "container:cvmfs2 soft.mugqic /cvmfs/soft.mugqic"   --fusemount "container:cvmfs2 ref.mugqic /cvmfs/ref.mugqic" ${args}
