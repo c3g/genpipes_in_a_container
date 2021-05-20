@@ -41,4 +41,4 @@ RUN ["ln", "-s", "/usr/local/etc/genpiperc", "/etc/profile.d/z90_genpipes.sh"]
 ADD init_genpipes /usr/local/bin/init_genpipes
 RUN chmod 755 /usr/local/bin/init_genpipes
 ENTRYPOINT ["init_genpipes"]
-# docker build --tag c3genomics/genpipes:beta .
+#docker build --tag c3genomics/genpipes:alpha -f Dockerfile . && singularity build genpipes_alpha.sif docker-daemon://c3genomics/genpipes:alpha
