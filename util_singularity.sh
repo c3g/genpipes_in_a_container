@@ -1,7 +1,7 @@
 #! /bin/bash
  args=$@
 if [ $# -lt 1 ]; then
-   args=../genpipes_centos7.sif
+   args=../genpipes_alpha.sif
 fi
 
 
