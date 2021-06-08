@@ -1,17 +1,17 @@
-# Genpipes container
+# GenPipes in a container
 
-You can use Genpipes in a Container (GiaC) to run Genpipes on a single machine, on a a Torque/PBS cluster or on a SLURM cluster.
+You can use GenPipes in a Container (GiaC) to run GenPipes on a single machine, on a a Torque/PBS cluster or on a SLURM cluster.
 
-If [Singularity](https://github.com/hpcng/singularity) is installed on your LINUX machine you are all set, a simple user with no special privilege is enough.
+If [Singularity](https://github.com/hpcng/singularity) is installed on your LINUX machine you are all set, a simple user with no special privilege is enough (no sudo needed).
 
-While you can use (GiaC) to debug and develop Genpipes on you machine on your machine laptop, [Genpipes](https://bitbucket.org/mugqic/genpipes/src/master/README.md) is design to run analysis on Super Computers.  
+While you can use (GiaC) to debug and develop GenPipes on your laptop, [GenPipes](https://bitbucket.org/mugqic/genpipes/src/master/README.md) is design to run analysis on Super Computers.  
 
 
 ## Install a compatible container technology on your machine
-Follow installation procedure from te  [Singularity install page](ttps://github.com/hpcng/singularity/blob/master/INSTALL.md)
+Follow installation procedure from the  [Singularity install page](ttps://github.com/hpcng/singularity/blob/master/INSTALL.md)
 
 
-You can also [Read the genpipes documentation](https://genpipes.readthedocs.io/)
+You can also [Read the GenPipes documentation](https://genpipes.readthedocs.io/)
 
 ## What exactly is avalable in that container?
 
@@ -23,7 +23,7 @@ The full tested and integrated C3G/MUGQIC software stack, a complete set of geno
 
 You can use this container to develop and test new version of GenPipes.
 
-Fist, clone genpipes somewhere under your $HOME folder three. Then get the container wrapper:
+Fist, clone GenPipes somewhere under your $HOME folder three. Then get the container wrapper:
 
 ```
 git clone https://bitbucket.org/mugqic/genpipes $WORKDIR/genpipes
@@ -40,9 +40,9 @@ export GEN_SHARED_CVMFS=$HOME/cvmfs
 BIND_LIST=
 ```
 
-`GEN_SHARED_CVMFS` will hold a cache for GiaC [CVMFS](https://cernvm.cern.ch/portal/filesystem) system, it will hold the genomes and software being used by Genpipes. This folder will grow with Genpipes usage. You can delete it in between usage, but keep in mind that once deleted it will need to be rebuild by downloading data form the internet.
+`GEN_SHARED_CVMFS` will hold a cache for GiaC [CVMFS](https://cernvm.cern.ch/portal/filesystem) system, it will hold the genomes and software being used by GenPipes. This folder will grow with GenPipes usage. You can delete it in between usage, but keep in mind that once deleted it will need to be rebuild by downloading data form the internet.
 
-`BIND_LIST` is a list of file system, separated by comma, you need Genpipes to have access to, by default, only your $HOME is mounted. For example if you are on an HPC system with a `/scratch` and `/data` space, you would have `BIND_LIST=/scratch,/data`. The string will be fed to Singularity `--bind` option, see `singularity --help` for more details.
+`BIND_LIST` is a list of file system, separated by comma, you need GenPipes to have access to, by default, only your $HOME is mounted. For example if you are on an HPC system with a `/scratch` and `/data` space, you would have `BIND_LIST=/scratch,/data`. The string will be fed to Singularity `--bind` option, see `singularity --help` for more details.
 
 You do not need any other setup on your machine.
 
