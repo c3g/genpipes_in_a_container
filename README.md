@@ -58,7 +58,20 @@ Create an ini file that fits your system and for the pipeline(s) you want to use
 Add the `-j {pbs,slurm}` option to fit your scheduler then the `--wrap` options so GenPipes with wrap all its command with the container instrumentation.
 
 # On a single machine.
-
+## With the wrapper option  
 Run the pipeline with the `--wrap`, `-j batch` and `--no-json` options!
 
 You can also run the `./genpipes/resources/container/bin/container_wrapper.sh` command to get inside the container with the right configuration. You will then have access to all the GenPipes tools be able to run them directly inside the container, on a single host without the `--wrap` option.
+
+## Whitout the wrapper option
+With `GEN_SHARED_CVMFS` being the cache directory on the host, `BIND_LIST` the file system to be acces by genpipes, {IMAGE_PATH}/genpipes.sif the [latest sif file released](https://github.com/c3g/genpipes_in_a_container/releases/latest). 
+```
+ singularity run --cleanenv -S /var/run/cvmfs -B ${GEN_SHARED_CVMFS}:/cvmfs-cache \
+    -B "$BIND_LIST" \
+    --fusemount \
+      "container:cvmfs2 cvmfs-config.computecanada.ca /cvmfs/cvmfs-config.computecanada.ca" \
+    --fusemount "container:cvmfs2 soft.mugqic /cvmfs/soft.mugqic"   \
+    --fusemount "container:cvmfs2 ref.mugqic /cvmfs/ref.mugqic" \
+    ${IMAGE_PATH}/genpipes.sif "$@"
+```
+
