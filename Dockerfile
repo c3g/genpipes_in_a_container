@@ -11,7 +11,7 @@ ENV MODULE_VERSION 4.1.2
 RUN yum install -y https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-${CVMFS_VERSION}.noarch.rpm \
              https://package.computecanada.ca/yum/cc-cvmfs-public/prod/RPM/computecanada-release-${CC_STACK}.noarch.rpm
 RUN yum update -y \
-  && yum install -y which wget unzip.x86_64 make.x86_64 gcc expectk \
+  && yum install -y pigz which wget unzip.x86_64 make.x86_64 gcc expectk \
   dejagnu less tcl-devel.x86_64 cvmfs-config-computecanada \
   cvmfs-fuse3 cvmfs-config-default \
   && yum clean all
@@ -41,4 +41,4 @@ RUN ["ln", "-s", "/usr/local/etc/genpiperc", "/etc/profile.d/z90_genpipes.sh"]
 ADD init_genpipes /usr/local/bin/init_genpipes
 RUN chmod 755 /usr/local/bin/init_genpipes
 ENTRYPOINT ["init_genpipes"]
-#docker build --tag c3genomics/genpipes:alpha -f Dockerfile . && singularity build genpipes_alpha.sif docker-daemon://c3genomics/genpipes:alpha
+#docker build --tag c3genomics/genpipes:alpha -f Dockerfile . && singularity build -F ../genpipes_alpha.sif docker-daemon://c3genomics/genpipes:alpha
