@@ -12,14 +12,14 @@ mkdir -p ${GEN_SHARED_CVMFS}
 
 
 if [ -z ${BIND_LIST+x} ]; then
-  singularity run --cleanenv -S /var/run/cvmfs -B ${GEN_SHARED_CVMFS}:/cvmfs-cache \
+  singularity run --env-file $HOME/.genpipes_env --cleanenv -S /var/run/cvmfs -B ${GEN_SHARED_CVMFS}:/cvmfs-cache \
     --fusemount \
       "container:cvmfs2 cvmfs-config.computecanada.ca /cvmfs/cvmfs-config.computecanada.ca" \
     --fusemount "container:cvmfs2 soft.mugqic /cvmfs/soft.mugqic"   \
     --fusemount "container:cvmfs2 ref.mugqic /cvmfs/ref.mugqic" \
     ${SCRIPTPATH}/images/genpipes.sif "$@"
 else
-  singularity run --cleanenv -S /var/run/cvmfs -B ${GEN_SHARED_CVMFS}:/cvmfs-cache \
+  singularity run --env-file $HOME/.genpipes_env --cleanenv -S /var/run/cvmfs -B ${GEN_SHARED_CVMFS}:/cvmfs-cache \
     -B "$BIND_LIST" \
     --fusemount \
       "container:cvmfs2 cvmfs-config.computecanada.ca /cvmfs/cvmfs-config.computecanada.ca" \
