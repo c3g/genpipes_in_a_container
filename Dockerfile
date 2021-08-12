@@ -11,7 +11,7 @@ ENV MODULE_VERSION 4.1.2
 RUN yum install -y https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-${CVMFS_VERSION}.noarch.rpm \
              https://package.computecanada.ca/yum/cc-cvmfs-public/prod/RPM/computecanada-release-${CC_STACK}.noarch.rpm
 RUN yum update -y \
-  && yum install -y pigz which wget unzip.x86_64 make.x86_64 gcc expectk \
+  && yum install -y ImageMagick pigz which wget unzip.x86_64 make.x86_64 gcc expectk \
   dejagnu less tcl-devel.x86_64 cvmfs-config-computecanada \
   cvmfs-fuse3 cvmfs-config-default \
   && yum clean all
