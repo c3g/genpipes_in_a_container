@@ -10,6 +10,7 @@ source ${SCRIPTPATH}/etc/wrapper.conf
 
 mkdir -p ${GEN_SHARED_CVMFS}
 
+touch $HOME/.genpipes_env # needs to exist for the run cmd not to crash
 
 if [ -z ${BIND_LIST+x} ]; then
   singularity run --env-file $HOME/.genpipes_env --cleanenv -S /var/run/cvmfs -B ${GEN_SHARED_CVMFS}:/cvmfs-cache \
