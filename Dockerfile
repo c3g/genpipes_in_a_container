@@ -11,13 +11,13 @@ ENV MODULE_VERSION 4.1.2
 RUN yum install -y https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-${CVMFS_VERSION}.noarch.rpm \
              https://package.computecanada.ca/yum/cc-cvmfs-public/prod/RPM/computecanada-release-${CC_STACK}.noarch.rpm
 RUN yum update -y \
-  && yum install -y ImageMagick pigz which wget unzip.x86_64 make.x86_64 gcc expectk \
+  && yum install -y ImageMagick pigz which wget unzip.x86_64 make.x86_64 gcc expectk file \
   dejagnu less tcl-devel.x86_64 cvmfs-config-computecanada \
   cvmfs-fuse3 cvmfs-config-default \
   && yum clean all
 
 RUN mkdir /cvmfs-cache  && chmod 777 /cvmfs-cache  /cvmfs
-RUN mkdir /cvmfs/ref.mugqic /cvmfs/soft.mugqic /cvmfs/cvmfs-config-computecanada.ca
+RUN mkdir /cvmfs/ref.mugqic /cvmfs/soft.mugqic /cvmfs/cvmfs-config.computecanada.ca
 
 # module
 RUN wget https://github.com/cea-hpc/modules/releases/download/v${MODULE_VERSION}/modules-${MODULE_VERSION}.tar.gz

@@ -9,7 +9,7 @@ mount -l  | grep soft.mugqic 2>/dev/null 1>&2
 retcode=$?
 if [ ${retcode} -ne 0 ] ; then
    # should only run in docker container, not singularity
-   mount -t cvmfs cvmfs-config.computecanada.ca /cvmfs/cvmfs-config-computecanada.ca/
+   mount -t cvmfs cvmfs-config.computecanada.ca /cvmfs/cvmfs-config.computecanada.ca/
    mount -t cvmfs ref.mugqic /cvmfs/ref.mugqic
    mount -t cvmfs soft.mugqic /cvmfs/soft.mugqic
 fi
