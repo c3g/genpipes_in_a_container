@@ -16,7 +16,14 @@ fi
 
 
 module use $MUGQIC_INSTALL_HOME/modulefiles
-module load mugqic/python/2.7.14
+
+if [[ ${PIPELINE_VERSION##/} =~ 3\.[0-9]+\.[0-9]+ ]]; then 
+   # version 3 releases are in python 2
+   module load mugqic/python/2.7.14
+else
+   # 4 and up are using the default python 3
+   module load mugqic/python
+fi
 
 if [ -z "${GENPIPES_DEV_DIR+x}" ]; then
     module load mugqic/genpipes${PIPELINE_VERSION}
