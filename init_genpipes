@@ -7,27 +7,22 @@ export MUGQIC_INSTALL_HOME=/cvmfs/soft.mugqic/CentOS6
 
 
 usage (){
-  echo -e "\nUsage: $0  [ -d <PATH> ] [-V <X.X.X> ] [ <cmd> ] " 1>&2;
+  echo -e "\nUsage: $0 [ [ -V <X.X.X> ] [ <cmd> ]" 1>&2;
   echo -e "\nOPTION"
-  echo -e "\t-d  Set a path to a genpipes repo that can supersedes"
-  echo -e "\t      the soft.mugqic repo's version (developer's mode)"
-  echo -e "\t-V    Genpipes version (will default to latest release)"
-  echo -e "\t-v  vebose mode, makes the parrot talk"
+  echo -e "\t-V  GenPipes version (will default to latest release)"
+  echo -e "\t-v  Vebose mode, makes the parrot talk"
   echo
 }
 
 export QUIET="-d clear"
 
-while getopts ":d:vV:h" opt; do
+while getopts ":vV:h" opt; do
   case $opt in
     v)
       unset QUIET
       ;;
     V)
       export PIPELINE_VERSION=/${OPTARG}
-      ;;
-    d)
-      export GENPIPES_DEV_DIR=/${OPTARG}
       ;;
     h)
       usage
@@ -45,26 +40,22 @@ while getopts ":d:vV:h" opt; do
   esac
 done
 
-
 shift $((OPTIND-1))
 # move the exec line to a script
 if [ $# -gt 0 ] ; then
   function finish {
-    rm ${genpipe_script}
+    rm "${genpipes_script}"
   }
-  genpipe_script=$(mktemp /tmp/genpipe_script.XXXXXX)
+  genpipes_script=$(mktemp /tmp/genpipes_script.XXXXXX)
   trap finish EXIT
-  chmod 755 ${genpipe_script}
-  echo '#! /bin/bash' >> ${genpipe_script}
-  echo "$@" >> ${genpipe_script}
+  chmod 755 "${genpipes_script}"
+  echo '#!/bin/bash' >> "${genpipes_script}"
+  echo "$@" >> "${genpipes_script}"
 fi
 
-
-
 # load cvmfs
-if [  ${genpipe_script}  ]; then
-  bash -ilc "${genpipe_script}"
+if [ "${genpipes_script}" ]; then
+  bash -ilc "${genpipes_script}"
 else
   bash -il
 fi
-
