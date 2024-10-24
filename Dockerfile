@@ -39,8 +39,6 @@ ADD ref.mugqic.local /etc/cvmfs/config.d/ref.mugqic.local
 
 RUN ["ln", "-s", "/usr/local/Modules/init/profile.sh", "/etc/profile.d/z00_module.sh"]
 RUN echo "source /etc/profile.d/z00_module.sh" >>  /etc/bashrc
-ADD devmodule/genpipes "/usr/local/Modules/modulefiles/."
-
 
 ADD genpipesrc /usr/local/etc/genpiperc
 RUN ["ln", "-s", "/usr/local/etc/genpiperc", "/etc/profile.d/z90_genpipes.sh"]
