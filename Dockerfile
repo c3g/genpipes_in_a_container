@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64,linux/arm64 ubuntu:24.04
+FROM ubuntu:24.04
 LABEL authors="P-O Quirion po.quirion@mcgill.ca, Paul Stretenowich paul.stretenowich@mcgill.ca"
 
 WORKDIR /tmp
