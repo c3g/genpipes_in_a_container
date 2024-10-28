@@ -1,0 +1,40 @@
+name: Create and push the sif image file
+
+# Configures this workflow to run every time a Docker package is published to the registry.
+on:
+  registry_package:
+    types: [published]
+
+# Defines two custom environment variables for the workflow. These are used for the Container registry domain, and a name for the Docker image that this workflow builds.
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  TAG_NAME: ${{ github.event.registry_package.package_version.container_metadata.tag.name }}
+
+# There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+
+    # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    if: ${{ env.TAG_NAME != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: eWaterCycle/setup-apptainer@v2
+        with:
+          apptainer-version: 1.3.4
+      - name: Create sif image
+        run: apptainer build -F container/wrapper_genpipes/images/genpipes-${{ env.TAG_NAME }}.sif docker://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }}
+      - name: Comit and Push sif image
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add container/wrapper_genpipes/images/genpipes-${{ env.TAG_NAME }}.sif
+          git commit -m "New sif image for version ${{ env.TAG_NAME }}"
+          git push

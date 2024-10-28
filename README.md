@@ -42,7 +42,7 @@ GEN_CONTAINERTYPE=singularity
 
 `BIND_LIST` is a list of file system, separated by comma, you need GenPipes to have access to, by default, only your $HOME is mounted. For example if you are on an HPC system with a `/scratch` and `/data` space, you would have `BIND_LIST=/scratch,/data`. The string will be fed to Singularity `--bind` option, see `singularity --help` for more details.
 
-`GEN_CONTAINERTYPE` is the container to use, either `singularity` (default) or `docker`.
+`GEN_CONTAINERTYPE` is the container to use, either `singularity` (default), `apptainer` or `docker`.
 
 You do not need any other setup on your machine.
 
@@ -75,6 +75,19 @@ With `GEN_SHARED_CVMFS` being the cache directory on the host, `BIND_LIST` the f
   --fusemount "container:cvmfs2 ref.mugqic /cvmfs/ref.mugqic" \
   ${IMAGE_PATH}/genpipes.sif
 ```
+### Using Apptainer
+With `GEN_SHARED_CVMFS` being the cache directory on the host, `BIND_LIST` the file system to be accessed by genpipes, {IMAGE_PATH}/genpipes.sif the [latest sif file released](https://github.com/c3g/genpipes_in_a_container/releases/latest).
+```
+ apptainer run \
+  --cleanenv \
+  -S /var/run/cvmfs \
+  -B ${GEN_SHARED_CVMFS}:/cvmfs-cache \
+  -B "$BIND_LIST" \
+  --fusemount "container:cvmfs2 cvmfs-config.computecanada.ca /cvmfs/cvmfs-config.computecanada.ca" \
+  --fusemount "container:cvmfs2 soft.mugqic /cvmfs/soft.mugqic"   \
+  --fusemount "container:cvmfs2 ref.mugqic /cvmfs/ref.mugqic" \
+  ${IMAGE_PATH}/genpipes.sif
+```
 ### Using Docker
 With `GEN_SHARED_CVMFS` being the cache directory on the host and `BIND_LIST` the file system to be accessed by genpipes.
 ```
@@ -89,5 +102,21 @@ docker run \
   -v $PWD:$PWD \
   --mount type=bind,source=${BIND_LIST},target=${BIND_LIST} \
   --mount type=bind,source=${GEN_SHARED_CVMFS},target=/cvmfs-cache \
-  c3genomics/genpipes:latest
+  ghcr.io/c3g/genpipes_in_a_container:latest
+```
+### Using Podman
+With `GEN_SHARED_CVMFS` being the cache directory on the host and `BIND_LIST` the file system to be accessed by genpipes. WARNING: Not supported on Mac OS X yet.
+```
+podman run \
+  -it \
+  --env-file $HOME/.genpipes_env \
+  --rm \
+  --device /dev/fuse \
+  --cap-add SYS_ADMIN \
+  --tmpfs /var/run/cvmfs:rw \
+  -w $PWD \
+  -v $PWD:$PWD \
+  --mount type=bind,source=${BIND_LIST},target=${BIND_LIST},Z \
+  --mount type=bind,source=$HOME/cvmfs,target=/cvmfs-cache,Z \
+  ghcr.io/c3g/genpipes_in_a_container:latest
 ```
