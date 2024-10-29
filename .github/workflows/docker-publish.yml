@@ -80,7 +80,7 @@ jobs:
 
   build-and-push-apptainer:
     runs-on: ubuntu-latest
-    if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
     steps:
       - uses: actions/checkout@v4
       - uses: eWaterCycle/setup-apptainer@v2
