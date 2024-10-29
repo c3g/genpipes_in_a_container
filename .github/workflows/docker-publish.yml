@@ -67,6 +67,28 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push Apptainer image
+        if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
+        steps:
+          - uses: actions/checkout@v4
+          - uses: eWaterCycle/setup-apptainer@v2
+            with:
+              apptainer-version: 1.3.4
+          - name: Create sif image
+            run: |
+              apptainer build -F container/wrapper_genpipes/images/genpipes-${{ env.TAG_NAME }}.sif docker-daemon://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }}
+              cd container/wrapper_genpipes/images/
+              ln -sf genpipes-${{ env.TAG_NAME }}.sif genpipes.sif
+              cd ../../
+              tar -zcvf wrapper_genpipes.tgz wrapper_genpipes
+          - name: Upload sif image
+            uses: svenstaro/upload-release-action@v2
+            with:
+              repo_token: ${{ secrets.GITHUB_TOKEN }}
+              file: container/wrapper_genpipes.tgz
+              asset_name: wrapper_genpipes.tgz
+              tag: ${{ github.ref }}
+              overwrite: true
 
       # This step generates an artifact attestation for the image, which is an unforgeable statement about where and how it was built.
       # It increases supply chain security for people who consume the image.
