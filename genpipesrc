@@ -1,8 +1,7 @@
 #source /etc/bashrc
 #source ~/.bashrc
 if [ -z "${QUIET+x}" ]; then
-echo -e "\nWait while Genpipes module are loaded. This could take a while,"
-echo -e   "  especially if the cvmfs cache is new\n"
+echo -e "\nWait while Genpipes module are loaded. This could take a while, especially if the cvmfs cache is new.\n"
 fi
 
 mount -l  | grep soft.mugqic 2>/dev/null 1>&2
@@ -14,20 +13,22 @@ if [ ${retcode} -ne 0 ] ; then
    mount -t cvmfs soft.mugqic /cvmfs/soft.mugqic
 fi
 
-
 module use $MUGQIC_INSTALL_HOME/modulefiles
+
+if [ -z "${PIPELINE_VERSION+x}" ]; then
+   PIPELINE_VERSION=$(module avail -d mugqic/genpipes 2>&1 | grep -o '[0-9]\.[0-9]\.[0-9]')
+   export PIPELINE_VERSION=/${PIPELINE_VERSION}
+fi
 
 if [[ ${PIPELINE_VERSION##/} =~ 3\.[0-9]+\.[0-9]+ ]]; then 
    # version 3 releases are in python 2
    module load mugqic/python/2.7.14
-else
-   # 4 and up are using the default python 3
+elif [[ ${PIPELINE_VERSION##/} =~ 4\.[0-9]+\.[0-9]+ ]]; then 
+   # version 4 releases are in python 3
    module load mugqic/python
+else
+   # 5 and up are NOT loading python anymore as GenPipes is now a pip package
+   :
 fi
 
-if [ -z "${GENPIPES_DEV_DIR+x}" ]; then
-    module load mugqic/genpipes${PIPELINE_VERSION}
-else
-    module use /usr/local/Modules/modulefiles
-    module load dev_genpipes
-fi
+module load mugqic/genpipes${PIPELINE_VERSION}

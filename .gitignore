@@ -1,4 +1,5 @@
 cvmfschecksum.*
 *_mount_cache.sh
-singularity/wrapper_genpipes/images
-singularity/wrapper_genpipes.tgz
+container/wrapper_genpipes/images
+container/wrapper_genpipes.tgz
+.DS_Store
