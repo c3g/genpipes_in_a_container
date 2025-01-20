@@ -16,21 +16,21 @@ The full tested and integrated C3G/MUGQIC software stack: a complete set of geno
 
 ## Setup a GiaC environment
 
-You can use this container to test new version of GenPipes.
+You can use this container to test new version of GenPipes. The following documentation is written to install GenPipes 6 and above.
 
 First, clone GenPipes and install it:
 
 ```bash
-git clone https://github.com/c3g/GenPipes.git
-cd genpipes
+git clone --branch <PIPELINE_VERSION> https://bitbucket.org/mugqic/genpipes genpipes-<PIPELINE_VERSION>
+cd genpipes-<PIPELINE_VERSION>
 pip install .
 ```
 
 If you prefer to have a virtual environment for GenPipes:
 
 ```bash
-git clone https://github.com/c3g/GenPipes.git
-cd genpipes
+git clone --branch <PIPELINE_VERSION> https://bitbucket.org/mugqic/genpipes genpipes-<PIPELINE_VERSION>
+cd genpipes-<PIPELINE_VERSION>
 python3 -m venv .genpipes_venv
 source .genpipes_venv/bin/activate
 pip install .
@@ -57,7 +57,7 @@ PIPELINE_VERSION=
 
 `GEN_CONTAINERTYPE` is the container to use, either `apptainer` (default), `singularity`, `docker` or `podman`.
 
-`PIPELINE_VERSION` is the version of GenPipes to use, by default the latest version is used.
+`PIPELINE_VERSION` is the version of GenPipes to use, by default the latest version is used. Make sure the version chosen is the same as the one you installed otherwise you might have unrecognized arguments or unxpected behaviour. If you want to use a version below 5 see [GenPipes 4 in a Container](#genpipes-4-in-a-container). GenPipes 5 is not working with the container so used GenPipes 6 instead, or GenPipes 4 for deprecated pipelines.
 
 You do not need any other setup on your machine.
 
@@ -136,3 +136,28 @@ podman run \
   --mount type=bind,source=$HOME/cvmfs,target=/cvmfs-cache,Z \
   ghcr.io/c3g/genpipes_in_a_container:latest
 ```
+
+# GenPipes 4 in a Container
+
+Assuming you have cloned GenPipes 6 or above and installed it following instructions above, you can still use GenPipes 4 in a Container. You have to checkout into the GenPipes 4 version you need and then use the `PIPELINE_VERSION` variable in the `wrapper.conf` file.
+Here is an exemple with GenPipes 4.6.1 version:
+
+```bash
+# Chanfe from the cloned released version to version 4.6.1
+git checkout 4.6.1
+# PIPELINE_VERSION being the initial clone here
+export MUGQIC_PIPELINES_HOME=path/to/genpipes-<PIPELINE_VERSION>
+```
+Then edit the `wrapper.conf` file to have:
+```bash
+# GEN_SHARED_CVMFS should have a sufficient amount of space to load full reference files
+export GEN_SHARED_CVMFS=$HOME/cvmfs
+BIND_LIST=
+GEN_CONTAINERTYPE=apptainer
+PIPELINE_VERSION=4.6.1
+```
+And then you can run GenPipes 4.6.1 with the `--wrap` option and with all GenPipes 4.6.1 options. For exemple with SLURM and ampliconseq pipeline:
+```bash
+$MUGQIC_PIPELINES_HOME/pipelines/ampliconseq/ampliconseq.py -j slurm -r readset.ampliconseq.txt -d design.ampliconseq.txt -c $MUGQIC_PIPELINES_HOME/pipelines/ampliconseq/ampliconseq.base.ini $MUGQIC_PIPELINES_HOME/pipelines/common_ini/<cluster>.ini --genpipes_file ampliconseq.sh --wrap
+```
+Once the GenPipes file `ampliconseq.sh` is written you can execute it `bash ampliconseq.sh` and all you individual job will be wrapped in the container.
