@@ -25,10 +25,10 @@ if [[ ${PIPELINE_VERSION##/} =~ 3\.[0-9]+\.[0-9]+ ]]; then
    module load mugqic/python/2.7.14
 elif [[ ${PIPELINE_VERSION##/} =~ 4\.[0-9]+\.[0-9]+ ]]; then 
    # version 4 releases are in python 3
-   module load mugqic/python
+   module load mugqic/python/3.10.4
 else
    # 5 and up are NOT loading python anymore as GenPipes is now a pip package
    :
 fi
 
-module load mugqic/genpipes${PIPELINE_VERSION}
+module load mugqic/genpipes/${PIPELINE_VERSION}

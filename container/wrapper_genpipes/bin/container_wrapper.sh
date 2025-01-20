@@ -16,6 +16,7 @@ touch "$HOME/.genpipes_env" # needs to exist for the run cmd not to crash
 if [ "$GEN_CONTAINERTYPE" = "singularity" ]; then
   if [ -z ${BIND_LIST+x} ]; then
     singularity run \
+      --env PIPELINE_VERSION=${PIPELINE_VERSION} \
       --env-file $HOME/.genpipes_env \
       --cleanenv \
       -S /var/run/cvmfs \
@@ -26,6 +27,7 @@ if [ "$GEN_CONTAINERTYPE" = "singularity" ]; then
       ${SCRIPTPATH}/images/genpipes.sif "$@"
   else
     singularity run \
+      --env PIPELINE_VERSION=${PIPELINE_VERSION} \
       --env-file $HOME/.genpipes_env \
       --cleanenv \
       -S /var/run/cvmfs \
@@ -39,6 +41,7 @@ if [ "$GEN_CONTAINERTYPE" = "singularity" ]; then
 elif [ "$GEN_CONTAINERTYPE" = "apptainer" ]; then
   if [ -z ${BIND_LIST+x} ]; then
     apptainer run \
+      --env PIPELINE_VERSION=${PIPELINE_VERSION} \
       --env-file $HOME/.genpipes_env \
       --cleanenv \
       -S /var/run/cvmfs \
@@ -49,6 +52,7 @@ elif [ "$GEN_CONTAINERTYPE" = "apptainer" ]; then
       ${SCRIPTPATH}/images/genpipes.sif "$@"
   else
     apptainer run \
+      --env PIPELINE_VERSION=${PIPELINE_VERSION} \
       --env-file $HOME/.genpipes_env \
       --cleanenv \
       -S /var/run/cvmfs \
@@ -63,6 +67,7 @@ elif [ "$GEN_CONTAINERTYPE" = "docker" ]; then
   if [ -z ${BIND_LIST+x} ]; then
     docker run \
       -it \
+      --env PIPELINE_VERSION=${PIPELINE_VERSION} \
       --env-file $HOME/.genpipes_env \
       --rm \
       --device /dev/fuse \
@@ -76,6 +81,7 @@ elif [ "$GEN_CONTAINERTYPE" = "docker" ]; then
   else
     docker run \
       -it \
+      --env PIPELINE_VERSION=${PIPELINE_VERSION} \
       --env-file $HOME/.genpipes_env \
       --rm \
       --device /dev/fuse \
@@ -90,6 +96,7 @@ elif [ "$GEN_CONTAINERTYPE" = "podman" ]; then
   if [ -z ${BIND_LIST+x} ]; then
     podman run \
       -it \
+      --env PIPELINE_VERSION=${PIPELINE_VERSION} \
       --env-file $HOME/.genpipes_env \
       --rm \
       --device /dev/fuse \
@@ -103,6 +110,7 @@ elif [ "$GEN_CONTAINERTYPE" = "podman" ]; then
   else
     podman run \
       -it \
+      --env PIPELINE_VERSION=${PIPELINE_VERSION} \
       --env-file $HOME/.genpipes_env \
       --rm \
       --device /dev/fuse \
