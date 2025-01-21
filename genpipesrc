@@ -1,7 +1,7 @@
 #source /etc/bashrc
 #source ~/.bashrc
 if [ -z "${QUIET+x}" ]; then
-echo -e "\nWait while Genpipes module are loaded. This could take a while, especially if the cvmfs cache is new.\n"
+   echo -e "\nWait while Genpipes module are loaded. This could take a while, especially if the cvmfs cache is new.\n"
 fi
 
 mount -l  | grep soft.mugqic 2>/dev/null 1>&2
@@ -31,4 +31,9 @@ else
    :
 fi
 
-module load mugqic/genpipes/${PIPELINE_VERSION}
+if [[ ${PIPELINE_VERSION##/} =~ dev ]]; then
+   source ${PIPELINE_VENV}
+else
+   module load mugqic/genpipes/${PIPELINE_VERSION}
+fi
+
