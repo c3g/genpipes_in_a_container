@@ -52,13 +52,13 @@ PIPELINE_VERSION=
 PIPELINE_DIR=
 ```
 
-`GEN_SHARED_CVMFS` will hold a cache for GiaC [CVMFS](https://cernvm.cern.ch/portal/filesystem) system, it will hold the genomes and softwares being used by GenPipes. This folder will grow with GenPipes usage. You can delete it in between usage, but keep in mind that once deleted it will need to be rebuild by downloading data form the internet.
+`GEN_SHARED_CVMFS` will hold a cache for GiaC [CVMFS](https://cernvm.cern.ch/portal/filesystem) system, it will hold the genomes and software being used by GenPipes. This folder will grow with GenPipes usage. You can delete it in between usage, but keep in mind that once deleted it will need to be rebuild by downloading data form the internet.
 
 `BIND_LIST` is a list of file system, separated by comma, you need GenPipes to have access to, by default, only your $HOME is mounted. For example if you are on an HPC system with a `/scratch` and `/data` space, you would have `BIND_LIST=/scratch,/data`. The string will be fed to Singularity `--bind` option, see `apptainer --help` for more details.
 
 `GEN_CONTAINERTYPE` is the container to use, either `apptainer` (default), `singularity`, `docker` or `podman`.
 
-`PIPELINE_VERSION` is the version of GenPipes to use, by default the latest version is used. The version has to be released and installed in cvmfs. Make sure the version chosen is the same as the one you installed otherwise you might have unrecognized arguments or unxpected behaviour. If you want to use the local installed version set it to `local`, see [Using a local GenPipes version](#using-a-local-genpipes-version) below. If you want to use a version below 5 see [GenPipes 4 in a Container](#genpipes-4-in-a-container). GenPipes 5 is not working with the container, use GenPipes 6 instead, or GenPipes 4 for deprecated pipelines.
+`PIPELINE_VERSION` is the version of GenPipes to use, by default the latest version is used. The version has to be released and installed in cvmfs. Make sure the version chosen is the same as the one you installed otherwise you might have unrecognized arguments or unexpected behavior. If you want to use the local installed version set it to `local`, see [Using a local GenPipes version](#using-a-local-genpipes-version) below. If you want to use a version below 5 see [GenPipes 4 in a Container](#genpipes-4-in-a-container). GenPipes 5 is not working with the container, use GenPipes 6 instead, or GenPipes 4 for deprecated pipelines.
 
 `PIPELINE_DIR` is the directory where GenPipes is locally cloned. See [Using a local GenPipes version](#using-a-local-genpipes-version) below.
 
@@ -158,10 +158,10 @@ PIPELINE_DIR=path/to/genpipes-<PIPELINE_VERSION>
 # GenPipes 4 in a Container
 
 Assuming you have cloned GenPipes 6 or above and installed it following instructions above, you can still use GenPipes 4 in a Container. You have to checkout into the GenPipes 4 version you need and then use the `PIPELINE_VERSION` variable in the `wrapper.conf` file.
-Here is an exemple with GenPipes 4.6.1 version:
+Here is an example with GenPipes 4.6.1 version:
 
 ```bash
-# Chanfe from the cloned released version to version 4.6.1
+# Change from the cloned released version to version 4.6.1
 git checkout 4.6.1
 # PIPELINE_VERSION being the initial clone here
 export MUGQIC_PIPELINES_HOME=path/to/genpipes-<PIPELINE_VERSION>
@@ -174,7 +174,7 @@ BIND_LIST=
 GEN_CONTAINERTYPE=apptainer
 PIPELINE_VERSION=4.6.1
 ```
-And then you can run GenPipes 4.6.1 with the `--wrap` option and with all GenPipes 4.6.1 options. For exemple with SLURM and ampliconseq pipeline:
+And then you can run GenPipes 4.6.1 with the `--wrap` option and with all GenPipes 4.6.1 options. For example with SLURM and ampliconseq pipeline:
 ```bash
 $MUGQIC_PIPELINES_HOME/pipelines/ampliconseq/ampliconseq.py -j slurm -r readset.ampliconseq.txt -d design.ampliconseq.txt -c $MUGQIC_PIPELINES_HOME/pipelines/ampliconseq/ampliconseq.base.ini $MUGQIC_PIPELINES_HOME/pipelines/common_ini/<cluster>.ini --genpipes_file ampliconseq.sh --wrap
 ```
