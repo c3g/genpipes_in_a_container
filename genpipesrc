@@ -1,39 +1,48 @@
 #source /etc/bashrc
 #source ~/.bashrc
 if [ -z "${QUIET+x}" ]; then
-   echo -e "\nWait while Genpipes module are loaded. This could take a while, especially if the cvmfs cache is new.\n"
+    echo -e "\nWait while Genpipes module are loaded. This could take a while, especially if the cvmfs cache is new.\n"
 fi
 
-mount -l  | grep soft.mugqic 2>/dev/null 1>&2
+mount -l | grep soft.mugqic 2>/dev/null 1>&2
 retcode=$?
 if [ ${retcode} -ne 0 ] ; then
-   # should only run in docker container, not singularity
-   mount -t cvmfs cvmfs-config.computecanada.ca /cvmfs/cvmfs-config.computecanada.ca/
-   mount -t cvmfs ref.mugqic /cvmfs/ref.mugqic
-   mount -t cvmfs soft.mugqic /cvmfs/soft.mugqic
+    # should only run in docker container, not singularity
+    mount -t cvmfs cvmfs-config.computecanada.ca /cvmfs/cvmfs-config.computecanada.ca/
+    mount -t cvmfs ref.mugqic /cvmfs/ref.mugqic
+    mount -t cvmfs soft.mugqic /cvmfs/soft.mugqic
 fi
 
 module use $MUGQIC_INSTALL_HOME/modulefiles
 
 if [ -z "${PIPELINE_VERSION+x}" ]; then
-   PIPELINE_VERSION=$(module avail -d mugqic/genpipes 2>&1 | grep -o '[0-9]\.[0-9]\.[0-9]')
-   export PIPELINE_VERSION=/${PIPELINE_VERSION}
+    PIPELINE_VERSION=$(module avail -d mugqic/genpipes 2>&1 | grep -o '[0-9]\.[0-9]\.[0-9]')
+    export PIPELINE_VERSION=${PIPELINE_VERSION}
 fi
 
-if [[ ${PIPELINE_VERSION##/} =~ 3\.[0-9]+\.[0-9]+ ]]; then 
-   # version 3 releases are in python 2
-   module load mugqic/python/2.7.14
-elif [[ ${PIPELINE_VERSION##/} =~ 4\.[0-9]+\.[0-9]+ ]]; then 
-   # version 4 releases are in python 3
-   module load mugqic/python/3.10.4
+if [[ ${PIPELINE_VERSION##/} =~ 3\.[0-9]+\.[0-9]+ ]]; then
+    # version 3 releases are in python 2
+    module load mugqic/python/2.7.14
+elif [[ ${PIPELINE_VERSION##/} =~ 4\.[0-9]+\.[0-9]+ ]]; then
+    # version 4 releases are in python 3
+    module load mugqic/python/3.10.4
 else
-   # 5 and up are NOT loading python anymore as GenPipes is now a pip package
-   :
+    # 5 and up are NOT loading python anymore as GenPipes is now a pip package
+    :
 fi
 
-if [[ ${PIPELINE_VERSION##/} =~ dev ]]; then
-   source ${PIPELINE_VENV}
+if [[ ${PIPELINE_VERSION##/} =~ local ]]; then
+    # Development mode, using the cloned repo mounted as /genpipes
+    if [ -f /genpipes/.genpipes_container_venv/bin/activate ]; then
+        module load mugqic/python/3.12.2
+        source /genpipes/.genpipes_container_venv/bin/activate
+    else
+        module load mugqic/python/3.12.2
+        python3 -m venv /genpipes/.genpipes_container_venv
+        source /genpipes/.genpipes_container_venv/bin/activate
+        pip install --prefix=/genpipes/.genpipes_container_venv /genpipes
+    fi
 else
-   module load mugqic/genpipes/${PIPELINE_VERSION}
+    # Not in development mode
+    module load mugqic/genpipes/${PIPELINE_VERSION}
 fi
-

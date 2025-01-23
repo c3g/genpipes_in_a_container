@@ -49,6 +49,7 @@ export GEN_SHARED_CVMFS=$HOME/cvmfs
 BIND_LIST=
 GEN_CONTAINERTYPE=apptainer
 PIPELINE_VERSION=
+PIPELINE_DIR=
 ```
 
 `GEN_SHARED_CVMFS` will hold a cache for GiaC [CVMFS](https://cernvm.cern.ch/portal/filesystem) system, it will hold the genomes and softwares being used by GenPipes. This folder will grow with GenPipes usage. You can delete it in between usage, but keep in mind that once deleted it will need to be rebuild by downloading data form the internet.
@@ -57,7 +58,9 @@ PIPELINE_VERSION=
 
 `GEN_CONTAINERTYPE` is the container to use, either `apptainer` (default), `singularity`, `docker` or `podman`.
 
-`PIPELINE_VERSION` is the version of GenPipes to use, by default the latest version is used. Make sure the version chosen is the same as the one you installed otherwise you might have unrecognized arguments or unxpected behaviour. If you want to use a version below 5 see [GenPipes 4 in a Container](#genpipes-4-in-a-container). GenPipes 5 is not working with the container so used GenPipes 6 instead, or GenPipes 4 for deprecated pipelines.
+`PIPELINE_VERSION` is the version of GenPipes to use, by default the latest version is used. The version has to be released and installed in cvmfs. Make sure the version chosen is the same as the one you installed otherwise you might have unrecognized arguments or unxpected behaviour. If you want to use the local installed version set it to `local`, see [Using a local GenPipes version](#using-a-local-genpipes-version) below. If you want to use a version below 5 see [GenPipes 4 in a Container](#genpipes-4-in-a-container). GenPipes 5 is not working with the container, use GenPipes 6 instead, or GenPipes 4 for deprecated pipelines.
+
+`PIPELINE_DIR` is the directory where GenPipes is locally cloned. See [Using a local GenPipes version](#using-a-local-genpipes-version) below.
 
 You do not need any other setup on your machine.
 
@@ -77,9 +80,10 @@ You can also run the `genpipes/resources/container/bin/container_wrapper.sh` com
 To use a GenPipes version other than latest run `genpipes/resources/container/bin/container_wrapper.sh -V <VERSION>`.
 
 ## Without the wrapper
-To use a GenPipes version other than latest add `-V <VERSION>` at the end of one of the command below.
+To use a GenPipes version other than latest add `-V <VERSION>` at the end of one of the command below. To test a cloned version, set `-V local` and mount the cloned directory with the right command. See detail in each section.
+
 ### Using Apptainer
-With `GEN_SHARED_CVMFS` being the cache directory on the host, `BIND_LIST` the file system to be accessed by GenPipes, {IMAGE_PATH}/genpipes.sif the [latest sif file released](https://github.com/c3g/genpipes_in_a_container/releases/latest).
+With `GEN_SHARED_CVMFS` being the cache directory on the host, `BIND_LIST` the file system to be accessed by GenPipes, {IMAGE_PATH}/genpipes.sif the [latest sif file released](https://github.com/c3g/genpipes_in_a_container/releases/latest). To use the cloned version, mount the directory with `-B ${PIPELINE_DIR}:/genpipes` option.
 ```bash
  apptainer run \
   --cleanenv \
@@ -92,7 +96,7 @@ With `GEN_SHARED_CVMFS` being the cache directory on the host, `BIND_LIST` the f
   ${IMAGE_PATH}/genpipes.sif
 ```
 ### Using Singularity
-With `GEN_SHARED_CVMFS` being the cache directory on the host, `BIND_LIST` the file system to be accessed by GenPipes, {IMAGE_PATH}/genpipes.sif the [latest sif file released](https://github.com/c3g/genpipes_in_a_container/releases/latest).
+With `GEN_SHARED_CVMFS` being the cache directory on the host, `BIND_LIST` the file system to be accessed by GenPipes, {IMAGE_PATH}/genpipes.sif the [latest sif file released](https://github.com/c3g/genpipes_in_a_container/releases/latest). To use the cloned version, mount the directory with `-B ${PIPELINE_DIR}:/genpipes` option.
 ```bash
  singularity run \
   --cleanenv \
@@ -105,7 +109,7 @@ With `GEN_SHARED_CVMFS` being the cache directory on the host, `BIND_LIST` the f
   ${IMAGE_PATH}/genpipes.sif
 ```
 ### Using Docker
-With `GEN_SHARED_CVMFS` being the cache directory on the host and `BIND_LIST` the file system to be accessed by GenPipes.
+With `GEN_SHARED_CVMFS` being the cache directory on the host and `BIND_LIST` the file system to be accessed by GenPipes. To use the cloned version, mount the directory with `--mount type=bind,source=${PIPELINE_DIR},target=/genpipes` option.
 ```bash
 docker run \
   -it \
@@ -121,7 +125,7 @@ docker run \
   ghcr.io/c3g/genpipes_in_a_container:latest
 ```
 ### Using Podman
-With `GEN_SHARED_CVMFS` being the cache directory on the host and `BIND_LIST` the file system to be accessed by GenPipes. WARNING: Not supported on Mac OS X yet.
+With `GEN_SHARED_CVMFS` being the cache directory on the host and `BIND_LIST` the file system to be accessed by GenPipes. WARNING: Not supported on Mac OS X yet. To use the cloned version, mount the directory with `--mount type=bind,source=${PIPELINE_DIR},target=/genpipes,Z` option.
 ```bash
 podman run \
   -it \
@@ -136,6 +140,20 @@ podman run \
   --mount type=bind,source=$HOME/cvmfs,target=/cvmfs-cache,Z \
   ghcr.io/c3g/genpipes_in_a_container:latest
 ```
+
+# Using a local GenPipes version
+
+If you want to use a local GenPipes version, you can use the `PIPELINE_DIR` variable in the `wrapper.conf` file. This variable should point to the directory where GenPipes is installed. The `PIPELINE_VERSION` variable should be left empty.
+
+```bash
+# GEN_SHARED_CVMFS should have a sufficient amount of space to load full reference files
+export GEN_SHARED_CVMFS=$HOME/cvmfs
+BIND_LIST=
+GEN_CONTAINERTYPE=apptainer
+PIPELINE_VERSION=local
+PIPELINE_DIR=path/to/genpipes-<PIPELINE_VERSION>
+```
+
 
 # GenPipes 4 in a Container
 
