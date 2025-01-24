@@ -15,15 +15,15 @@ fi
 
 module use $MUGQIC_INSTALL_HOME/modulefiles
 
-if [ -z "${PIPELINE_VERSION+x}" ]; then
-    PIPELINE_VERSION=$(module avail -d mugqic/genpipes 2>&1 | grep -o '[0-9]\.[0-9]\.[0-9]')
-    export PIPELINE_VERSION=${PIPELINE_VERSION}
+if [ -z "${GENPIPES_VERSION+x}" ]; then
+    GENPIPES_VERSION=$(module avail -d mugqic/genpipes 2>&1 | grep -o '[0-9]\.[0-9]\.[0-9]')
+    export GENPIPES_VERSION=${GENPIPES_VERSION}
 fi
 
-if [[ ${PIPELINE_VERSION##/} =~ 3\.[0-9]+\.[0-9]+ ]]; then
+if [[ ${GENPIPES_VERSION##/} =~ 3\.[0-9]+\.[0-9]+ ]]; then
     # version 3 releases are in python 2
     module load mugqic/python/2.7.14
-elif [[ ${PIPELINE_VERSION##/} =~ 4\.[0-9]+\.[0-9]+ ]]; then
+elif [[ ${GENPIPES_VERSION##/} =~ 4\.[0-9]+\.[0-9]+ ]]; then
     # version 4 releases are in python 3
     module load mugqic/python/3.10.4
 else
@@ -31,7 +31,7 @@ else
     :
 fi
 
-if [[ ${PIPELINE_VERSION##/} =~ local ]]; then
+if [[ ${GENPIPES_VERSION##/} =~ local ]]; then
     # Development mode, using the cloned repo mounted as /genpipes
     if [ -f /genpipes/.genpipes_container_venv/bin/activate ]; then
         module load mugqic/python/3.12.2
@@ -44,5 +44,5 @@ if [[ ${PIPELINE_VERSION##/} =~ local ]]; then
     fi
 else
     # Not in development mode
-    module load mugqic/genpipes/${PIPELINE_VERSION}
+    module load mugqic/genpipes/${GENPIPES_VERSION}
 fi

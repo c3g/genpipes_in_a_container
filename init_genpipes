@@ -22,7 +22,7 @@ while getopts ":vV:h:" opt; do
       unset QUIET
       ;;
     V)
-      export PIPELINE_VERSION=${OPTARG}
+      export GENPIPES_VERSION=${OPTARG}
       ;;
     h)
       usage
