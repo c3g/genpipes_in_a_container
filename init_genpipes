@@ -7,22 +7,22 @@ export MUGQIC_INSTALL_HOME=/cvmfs/soft.mugqic/CentOS6
 
 
 usage (){
-  echo -e "\nUsage: $0 [ [ -V <X.X.X> ] [ <cmd> ]" 1>&2;
+  echo -e "\nUsage: $0 [ -V <X.X.X> ] [ <cmd> ]" 1>&2;
   echo -e "\nOPTION"
-  echo -e "\t-V  GenPipes version (will default to latest release)"
+  echo -e "\t-V  GenPipes version (will default to latest release). For development versions, use 'dev'"
   echo -e "\t-v  Vebose mode, makes the parrot talk"
   echo
 }
 
 export QUIET="-d clear"
 
-while getopts ":vV:h" opt; do
+while getopts ":vV:h:" opt; do
   case $opt in
     v)
       unset QUIET
       ;;
     V)
-      export PIPELINE_VERSION=/${OPTARG}
+      export GENPIPES_VERSION=${OPTARG}
       ;;
     h)
       usage
