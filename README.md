@@ -10,6 +10,8 @@ While you can use (GiaC) to debug GenPipes on your laptop, [GenPipes](https://bi
 
 Follow installation procedure from the [Apptainer install page](https://apptainer.org/docs/user/latest/quick_start.html#installation) or the [Docker install page](https://docs.docker.com/get-docker/).
 
+If you are using Docker on a Mac, ensure that you are using the Apple Virtualization Virtual Machine Manager (VMM) with the gRPC FUSE file sharing implementation.
+
 ## What exactly is available in that container?
 
 The full tested and integrated C3G/MUGQIC software stack: a complete set of genomics references and bioinformatics software; [for more details](http://www.computationalgenomics.ca/cvmfs-modules/).
