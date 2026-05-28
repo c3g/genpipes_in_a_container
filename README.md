@@ -10,9 +10,21 @@ While you can use (GiaC) to debug GenPipes on your laptop, [GenPipes](https://bi
 
 Follow installation procedure from the [Apptainer install page](https://apptainer.org/docs/user/latest/quick_start.html#installation) or the [Docker install page](https://docs.docker.com/get-docker/).
 
+When using Docker on macOS, containers run inside a Linux virtual machine. An intermittent issue has been observed affecting CVMFS/FUSE initialization when using certain Docker Desktop virtualization and file system configurations.
+
+This issue can be mitigated by using:
+* Apple Virtualization Framework as the Virtual Machine Manager (VMM)
+* gRPC FUSE as the file sharing implementation
+
+These settings can be configured in Docker Desktop under:
+
+`Settings > Virtual Machine Options`
+
+<img width="2756" height="1458" alt="Docker_config" src="https://github.com/user-attachments/assets/90155c69-964b-49ba-9020-ec9ab9fd0c22" />
+
 ## What exactly is available in that container?
 
-The full tested and integrated C3G/MUGQIC software stack: a complete set of genomics references and bioinformatics software; [for more details](http://www.computationalgenomics.ca/cvmfs-modules/).
+A collection of bioinformatics software modules available under `/cvmfs/soft.mugqic`. It also includes a set of genomic references and test data, available under `/cvmfs/ref.mugqic`.
 
 ## Setup a GiaC environment
 
