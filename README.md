@@ -20,6 +20,8 @@ These settings can be configured in Docker Desktop under:
 
 `Settings > Virtual Machine Options`
 
+<img width="2756" height="1458" alt="Docker_config" src="https://github.com/user-attachments/assets/90155c69-964b-49ba-9020-ec9ab9fd0c22" />
+
 ## What exactly is available in that container?
 
 A collection of bioinformatics software modules available under `/cvmfs/soft.mugqic`. It also includes a set of genomic references and test data, available under `/cvmfs/ref.mugqic`.
