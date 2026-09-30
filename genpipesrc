@@ -16,14 +16,14 @@ fi
 module use $MUGQIC_INSTALL_HOME/modulefiles
 
 if [ -z "${GENPIPES_VERSION}" ]; then
-    GENPIPES_VERSION=$(module avail -d mugqic/genpipes 2>&1 | grep -o '[0-9]\.[0-9]\.[0-9]')
+    GENPIPES_VERSION=$(module avail -d mugqic/genpipes 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
     export GENPIPES_VERSION=${GENPIPES_VERSION}
 fi
 
-if [[ ${GENPIPES_VERSION##/} =~ 3\.[0-9]+\.[0-9]+ ]]; then
+if [[ ${GENPIPES_VERSION##/} =~ ^3\.[0-9]+\.[0-9]+ ]]; then
     # version 3 releases are in python 2
     module load mugqic/python/2.7.14
-elif [[ ${GENPIPES_VERSION##/} =~ 4\.[0-9]+\.[0-9]+ ]]; then
+elif [[ ${GENPIPES_VERSION##/} =~ ^4\.[0-9]+\.[0-9]+ ]]; then
     # version 4 releases are in python 3
     module load mugqic/python/3.10.4
 else
