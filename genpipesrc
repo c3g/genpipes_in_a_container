@@ -15,7 +15,7 @@ fi
 
 module use $MUGQIC_INSTALL_HOME/modulefiles
 
-if [ -z "${GENPIPES_VERSION+x}" ]; then
+if [ -z "${GENPIPES_VERSION}" ]; then
     GENPIPES_VERSION=$(module avail -d mugqic/genpipes 2>&1 | grep -o '[0-9]\.[0-9]\.[0-9]')
     export GENPIPES_VERSION=${GENPIPES_VERSION}
 fi

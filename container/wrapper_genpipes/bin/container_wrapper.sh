@@ -9,20 +9,32 @@ GENPIPES_CONTAINERTYPE=singularity
 
 source "${SCRIPTPATH}"/etc/wrapper.conf
 
+# Backward compatibility with wrapper.conf files using the former GEN_SHARED_CVMFS name
+if [ -n "${GEN_SHARED_CVMFS:-}" ] && [ "${GENPIPES_SHARED_CVMFS}" = "/tmp/cvmfs-cache" ]; then
+  GENPIPES_SHARED_CVMFS=${GEN_SHARED_CVMFS}
+fi
+
 mkdir -p ${GENPIPES_SHARED_CVMFS}
 
 touch "$HOME/.genpipes_env" # needs to exist for the run cmd not to crash
 
+# Only pass GENPIPES_VERSION when set, an empty value would prevent the latest version detection
+if [ -z "${GENPIPES_VERSION}" ]; then
+  GENPIPES_ENV=
+else
+  GENPIPES_ENV="--env GENPIPES_VERSION=${GENPIPES_VERSION}"
+fi
+
 if [ "$GENPIPES_CONTAINERTYPE" = "singularity" ]; then
   # if GENPIPES_DIR is set use it as mount
-  if [ -z ${GENPIPES_DIR+x} ]; then
+  if [ -z "${GENPIPES_DIR}" ]; then
     GENPIPES_MOUNT=
   else
     GENPIPES_MOUNT="-B ${GENPIPES_DIR}:/genpipes"
   fi
-  if [ -z ${BIND_LIST+x} ]; then
+  if [ -z "${BIND_LIST}" ]; then
     singularity run \
-      --env GENPIPES_VERSION=${GENPIPES_VERSION} \
+      ${GENPIPES_ENV} \
       --env-file $HOME/.genpipes_env \
       --cleanenv \
       -S /var/run/cvmfs \
@@ -33,7 +45,7 @@ if [ "$GENPIPES_CONTAINERTYPE" = "singularity" ]; then
       ${SCRIPTPATH}/images/genpipes.sif "$@"
   else
     singularity run \
-      --env GENPIPES_VERSION=${GENPIPES_VERSION} \
+      ${GENPIPES_ENV} \
       --env-file $HOME/.genpipes_env \
       --cleanenv \
       -S /var/run/cvmfs \
@@ -45,14 +57,14 @@ if [ "$GENPIPES_CONTAINERTYPE" = "singularity" ]; then
       ${SCRIPTPATH}/images/genpipes.sif "$@"
   fi
 elif [ "$GENPIPES_CONTAINERTYPE" = "apptainer" ]; then
-  if [ -z ${GENPIPES_DIR+x} ]; then
+  if [ -z "${GENPIPES_DIR}" ]; then
     GENPIPES_MOUNT=
   else
     GENPIPES_MOUNT="-B ${GENPIPES_DIR}:/genpipes"
   fi
-  if [ -z ${BIND_LIST+x} ]; then
+  if [ -z "${BIND_LIST}" ]; then
     apptainer run \
-      --env GENPIPES_VERSION=${GENPIPES_VERSION} \
+      ${GENPIPES_ENV} \
       --env-file $HOME/.genpipes_env \
       --cleanenv \
       -S /var/run/cvmfs \
@@ -63,7 +75,7 @@ elif [ "$GENPIPES_CONTAINERTYPE" = "apptainer" ]; then
       ${SCRIPTPATH}/images/genpipes.sif "$@"
   else
     apptainer run \
-      --env GENPIPES_VERSION=${GENPIPES_VERSION} \
+      ${GENPIPES_ENV} \
       --env-file $HOME/.genpipes_env \
       --cleanenv \
       -S /var/run/cvmfs \
@@ -75,15 +87,22 @@ elif [ "$GENPIPES_CONTAINERTYPE" = "apptainer" ]; then
       ${SCRIPTPATH}/images/genpipes.sif "$@"
   fi
 elif [ "$GENPIPES_CONTAINERTYPE" = "docker" ]; then
-  if [ -z ${GENPIPES_DIR+x} ]; then
+  if [ -z "${GENPIPES_DIR}" ]; then
     GENPIPES_MOUNT=
   else
     GENPIPES_MOUNT="--mount type=bind,source=${GENPIPES_DIR},target=/genpipes"
   fi
-  if [ -z ${BIND_LIST+x} ]; then
+  BIND_MOUNTS=
+  for BIND_PATH in ${BIND_LIST//,/ }; do
+    # $PWD is already mounted, a duplicate mount point makes docker/podman fail
+    [ "${BIND_PATH%/}" = "${PWD}" ] && continue
+    BIND_MOUNTS="${BIND_MOUNTS} --mount type=bind,source=${BIND_PATH},target=${BIND_PATH}"
+  done
+  if [ -z "${BIND_LIST}" ]; then
     docker run \
       -it \
-      --env GENPIPES_VERSION=${GENPIPES_VERSION} \
+      --security-opt apparmor=unconfined \
+      ${GENPIPES_ENV} \
       --env-file $HOME/.genpipes_env \
       --rm \
       --device /dev/fuse \
@@ -96,7 +115,8 @@ elif [ "$GENPIPES_CONTAINERTYPE" = "docker" ]; then
   else
     docker run \
       -it \
-      --env GENPIPES_VERSION=${GENPIPES_VERSION} \
+      --security-opt apparmor=unconfined \
+      ${GENPIPES_ENV} \
       --env-file $HOME/.genpipes_env \
       --rm \
       --device /dev/fuse \
@@ -104,20 +124,26 @@ elif [ "$GENPIPES_CONTAINERTYPE" = "docker" ]; then
       --tmpfs /var/run/cvmfs:rw \
       -w $PWD \
       -v $PWD:$PWD \
-      --mount type=bind,source=${BIND_LIST},target=${BIND_LIST} \
+      ${BIND_MOUNTS} \
       --mount type=bind,source=${GENPIPES_SHARED_CVMFS},target=/cvmfs-cache ${GENPIPES_MOUNT} \
       ghcr.io/c3g/genpipes_in_a_container:latest "$@"
   fi
 elif [ "$GENPIPES_CONTAINERTYPE" = "podman" ]; then
-  if [ -z ${GENPIPES_DIR+x} ]; then
+  if [ -z "${GENPIPES_DIR}" ]; then
     GENPIPES_MOUNT=
   else
     GENPIPES_MOUNT="--mount type=bind,source=${GENPIPES_DIR},target=/genpipes,Z"
   fi
-  if [ -z ${BIND_LIST+x} ]; then
+  BIND_MOUNTS=
+  for BIND_PATH in ${BIND_LIST//,/ }; do
+    # $PWD is already mounted, a duplicate mount point makes docker/podman fail
+    [ "${BIND_PATH%/}" = "${PWD}" ] && continue
+    BIND_MOUNTS="${BIND_MOUNTS} --mount type=bind,source=${BIND_PATH},target=${BIND_PATH},Z"
+  done
+  if [ -z "${BIND_LIST}" ]; then
     podman run \
       -it \
-      --env GENPIPES_VERSION=${GENPIPES_VERSION} \
+      ${GENPIPES_ENV} \
       --env-file $HOME/.genpipes_env \
       --rm \
       --device /dev/fuse \
@@ -130,7 +156,7 @@ elif [ "$GENPIPES_CONTAINERTYPE" = "podman" ]; then
   else
     podman run \
       -it \
-      --env GENPIPES_VERSION=${GENPIPES_VERSION} \
+      ${GENPIPES_ENV} \
       --env-file $HOME/.genpipes_env \
       --rm \
       --device /dev/fuse \
@@ -138,7 +164,7 @@ elif [ "$GENPIPES_CONTAINERTYPE" = "podman" ]; then
       --tmpfs /var/run/cvmfs:rw \
       -w $PWD \
       -v $PWD:$PWD \
-      --mount type=bind,source=${BIND_LIST},target=${BIND_LIST},Z \
+      ${BIND_MOUNTS} \
       --mount type=bind,source=${GENPIPES_SHARED_CVMFS},target=/cvmfs-cache,Z ${GENPIPES_MOUNT} \
       ghcr.io/c3g/genpipes_in_a_container:latest "$@"
   fi
