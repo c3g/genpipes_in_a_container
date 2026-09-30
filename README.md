@@ -6,6 +6,8 @@ If Singularity/Docker is installed on your LINUX machine you are all set, a simp
 
 The software available in CVMFS is built for x86-64 only. GiaC works on x86-64 Linux and on macOS with Docker Desktop (tested on Apple silicon with Rosetta enabled). It does not work on arm64 Linux (e.g. AWS Graviton or an arm64 virtual machine).
 
+The container downloads the CVMFS data itself, so the machine needs outbound plain HTTP access (ports 80 and 8000) to the CVMFS servers. Sites where this access is only possible through a proxy are not supported yet. On such a machine, CVMFS fails with `Failed to initialize root file catalog`.
+
 While you can use (GiaC) to debug GenPipes on your laptop, [GenPipes](https://github.com/c3g/GenPipes/blob/main/README.md) is design to run analysis on Super Computers.
 
 ## Install a compatible container technology on your machine
@@ -102,6 +104,17 @@ To use a GenPipes version other than latest run `$GIAC_DIR/bin/container_wrapper
 
 ## Without the wrapper
 To use a GenPipes version other than latest add `-V <VERSION>` at the end of one of the command below. To test a cloned version, set `-V local` and mount the cloned directory with the right command. See detail in each section.
+
+The commands below read `GENPIPES_SHARED_CVMFS` and `BIND_LIST` from your shell, not from `wrapper.conf`. Set them and create the cache directory first:
+
+```bash
+# GENPIPES_SHARED_CVMFS should have a sufficient amount of space to load full reference files
+export GENPIPES_SHARED_CVMFS=$HOME/cvmfs
+export BIND_LIST=/scratch,/data
+mkdir -p ${GENPIPES_SHARED_CVMFS}
+```
+
+If `GENPIPES_SHARED_CVMFS` is not set, CVMFS fails with `cannot create workspace directory /cvmfs-cache/...` and GenPipes is not available in the container.
 
 ### Using Apptainer
 With `GENPIPES_SHARED_CVMFS` being the cache directory on the host, `BIND_LIST` the file system to be accessed by GenPipes, {IMAGE_PATH}/genpipes.sif the [latest sif file released](https://github.com/c3g/genpipes_in_a_container/releases/latest). To use the cloned version, mount the directory with `-B ${GENPIPES_DIR}:/genpipes` option.
