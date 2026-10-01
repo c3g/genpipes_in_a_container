@@ -18,6 +18,8 @@ if [ -z "${IMAGE}" ]; then
 fi
 
 CACHE_DIR=$(mktemp -d)
+# Like a directory created with mkdir: mktemp makes it 700, which the container cvmfs user cannot enter
+chmod 755 "${CACHE_DIR}"
 FAILED=0
 
 # Runs the image with the README docker options and a host cache directory, output in OUT.
