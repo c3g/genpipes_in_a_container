@@ -1,0 +1,121 @@
+name: Clean up container images
+
+# Keeps the ghcr.io package tidy:
+# - the pr-N image of a PR is deleted when the PR is closed (merged or not);
+# - every week, pr-* images older than 30 days and untagged images older than 14 days are deleted.
+#   Release (v*), latest and main images and the platform images they use are always kept.
+# A PR changing this file runs the weekly cleanup in dry run mode, to review what it would delete.
+# Needs the repository to have the Admin role in the package "Manage Actions access" settings.
+on:
+  pull_request:
+    types: [opened, synchronize, closed]
+    branches: ['main']
+  schedule:
+    # Mondays at 06:00 UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Only list what would be deleted'
+        type: boolean
+        default: true
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+  PACKAGE: ${{ github.event.repository.name }}
+  # Never deleted, whatever the other options
+  KEEP_TAGS: 'v*,latest,main'
+
+concurrency:
+  group: cleanup-images
+  cancel-in-progress: false
+
+jobs:
+  delete-pr-image:
+    name: Delete PR image
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.head.repo.fork == false }}
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      # Only PRs changing the image publish a pr-N image
+      - name: Check if the PR image exists
+        id: image
+        run: |
+          if docker buildx imagetools inspect "${{ env.IMAGE }}:pr-${{ github.event.pull_request.number }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "No pr-${{ github.event.pull_request.number }} image, nothing to delete"
+            echo "exists=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Delete PR image
+        if: steps.image.outputs.exists == 'true'
+        uses: dataaxiom/ghcr-cleanup-action@d52806a0dc70b430571a37da1fde39733ffd640f # v1.2.2
+        with:
+          package: ${{ env.PACKAGE }}
+          delete-tags: pr-${{ github.event.pull_request.number }}
+          exclude-tags: ${{ env.KEEP_TAGS }}
+
+  cleanup:
+    name: Weekly cleanup
+    if: ${{ github.event_name != 'pull_request' || (github.event.action != 'closed' && github.event.pull_request.head.repo.fork == false) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Scheduled runs delete, manual runs follow the dry-run input, PRs changing this file only simulate
+      - name: Select mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -qx '.github/workflows/cleanup-images.yml'; then
+              echo "run=true" >> "${GITHUB_OUTPUT}"
+              echo "dry-run=true" >> "${GITHUB_OUTPUT}"
+            else
+              echo "Cleanup workflow not changed in this PR, nothing to do"
+              echo "run=false" >> "${GITHUB_OUTPUT}"
+            fi
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> "${GITHUB_OUTPUT}"
+            echo "dry-run=${{ inputs.dry-run }}" >> "${GITHUB_OUTPUT}"
+          else
+            echo "run=true" >> "${GITHUB_OUTPUT}"
+            echo "dry-run=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Delete PR images older than 30 days
+        if: steps.mode.outputs.run == 'true'
+        uses: dataaxiom/ghcr-cleanup-action@d52806a0dc70b430571a37da1fde39733ffd640f # v1.2.2
+        with:
+          package: ${{ env.PACKAGE }}
+          delete-tags: 'pr-*'
+          exclude-tags: ${{ env.KEEP_TAGS }}
+          older-than: 30 days
+          dry-run: ${{ steps.mode.outputs.dry-run }}
+
+      - name: Delete untagged images older than 14 days
+        if: steps.mode.outputs.run == 'true'
+        uses: dataaxiom/ghcr-cleanup-action@d52806a0dc70b430571a37da1fde39733ffd640f # v1.2.2
+        with:
+          package: ${{ env.PACKAGE }}
+          delete-untagged: true
+          delete-orphaned-images: true
+          exclude-tags: ${{ env.KEEP_TAGS }}
+          older-than: 14 days
+          dry-run: ${{ steps.mode.outputs.dry-run }}
+
+      - name: Check remaining multi-architecture images
+        if: steps.mode.outputs.run == 'true' && steps.mode.outputs.dry-run == 'false'
+        uses: dataaxiom/ghcr-cleanup-action@d52806a0dc70b430571a37da1fde39733ffd640f # v1.2.2
+        with:
+          package: ${{ env.PACKAGE }}
+          validate: true
+          dry-run: true
