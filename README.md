@@ -130,6 +130,8 @@ The commands below read `GENPIPES_SHARED_CVMFS` and `BIND_LIST` from your shell,
 export GENPIPES_SHARED_CVMFS=$HOME/cvmfs
 export BIND_LIST=/scratch,/data
 mkdir -p ${GENPIPES_SHARED_CVMFS}
+# Docker/Podman: the container cvmfs user must be able to enter the cache directory
+chmod go+rx ${GENPIPES_SHARED_CVMFS}
 ```
 
 If `GENPIPES_SHARED_CVMFS` is not set, CVMFS fails with `cannot create workspace directory /cvmfs-cache/...` and GenPipes is not available in the container.

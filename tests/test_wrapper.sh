@@ -134,5 +134,18 @@ CASE="unknown container type"
 run_wrapper "${TEMPLATE_CONF/GENPIPES_CONTAINERTYPE=apptainer/GENPIPES_CONTAINERTYPE=lxc}"
 expect_rc 1
 
+# stat syntax differs between Linux and macOS
+mode_of() { stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1"; }
+
+CASE="cache directory made enterable by the container cvmfs user"
+mkdir -p "${WORK_DIR}/cache700" && chmod 700 "${WORK_DIR}/cache700"
+run_wrapper "${TEMPLATE_CONF/GENPIPES_CONTAINERTYPE=apptainer/GENPIPES_CONTAINERTYPE=docker}"$'\n'"GENPIPES_SHARED_CVMFS=${WORK_DIR}/cache700"
+if [ "$(mode_of "${WORK_DIR}/cache700")" = "755" ]; then PASSED=$((PASSED+1)); else FAILED=$((FAILED+1)); echo "FAIL [${CASE}] mode $(mode_of "${WORK_DIR}/cache700"), expected 755"; fi
+
+CASE="shared cache directory keeps its group write"
+mkdir -p "${WORK_DIR}/cache775" && chmod 775 "${WORK_DIR}/cache775"
+run_wrapper "${TEMPLATE_CONF/GENPIPES_CONTAINERTYPE=apptainer/GENPIPES_CONTAINERTYPE=docker}"$'\n'"GENPIPES_SHARED_CVMFS=${WORK_DIR}/cache775"
+if [ "$(mode_of "${WORK_DIR}/cache775")" = "775" ]; then PASSED=$((PASSED+1)); else FAILED=$((FAILED+1)); echo "FAIL [${CASE}] mode $(mode_of "${WORK_DIR}/cache775"), expected 775"; fi
+
 echo "${PASSED} passed, ${FAILED} failed"
 [ "${FAILED}" -eq 0 ]

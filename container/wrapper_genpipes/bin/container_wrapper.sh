@@ -17,6 +17,9 @@ if [ -n "${GEN_SHARED_CVMFS:-}" ] && [ "${GENPIPES_SHARED_CVMFS}" = "/tmp/cvmfs-
 fi
 
 mkdir -p ${GENPIPES_SHARED_CVMFS}
+# With docker/podman, CVMFS uses the cache as the container cvmfs user, which must be able to enter it.
+# Only add read/traverse rights (e.g. 700 -> 755), never remove any, so a shared group cache keeps its group write.
+chmod go+rx "${GENPIPES_SHARED_CVMFS}" 2>/dev/null
 
 touch "$HOME/.genpipes_env" # needs to exist for the run cmd not to crash
 
