@@ -1,0 +1,68 @@
+name: Tests
+
+# Runs on every PR to 'main', so both jobs can be required status checks.
+# The image smoke test only builds and runs the image when a PR changes a file that goes in it.
+on:
+  pull_request:
+    branches: ['main']
+  push:
+    branches: ['main']
+
+jobs:
+  wrapper:
+    name: Wrapper tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check script syntax
+        run: |
+          for script in container/wrapper_genpipes/bin/container_wrapper.sh genpipesrc init_genpipes tests/*.sh; do
+            bash -n "${script}"
+          done
+
+      - name: Run wrapper tests
+        run: tests/test_wrapper.sh
+
+  image:
+    name: Image smoke test
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Same file list as the docker-publishPR workflow: the files copied in the image
+      - name: Check if the image changed
+        id: changes
+        run: |
+          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -qE '^(Dockerfile|container/|default\.local|genpipesrc|init_genpipes|ref\.mugqic\.local|soft\.mugqic\.local|tests/smoke_image\.sh)'; then
+            echo "image=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "No image change, smoke test not needed"
+            echo "image=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Set up Docker Buildx
+        if: steps.changes.outputs.image == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        if: steps.changes.outputs.image == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: giac:test
+          build-args: |
+            GIAC_VERSION=test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run smoke test
+        if: steps.changes.outputs.image == 'true'
+        run: tests/smoke_image.sh giac:test test
