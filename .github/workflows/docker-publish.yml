@@ -114,6 +114,13 @@ jobs:
       - name: Check release bundle
         run: tests/check_release_bundle.sh container/wrapper_genpipes.tgz ${{ github.ref_name }}
 
+      # Reminder only, the README can be updated on main after the release
+      - name: Check README versions table
+        run: |
+          if ! grep -qE '^\| ${{ github.ref_name }} \|' README.md; then
+            echo "::warning title=README versions table::No ${{ github.ref_name }} row in the README 'GiaC and GenPipes versions' table, please add it on main."
+          fi
+
       - name: Upload sif image
         uses: svenstaro/upload-release-action@v2
         with:
