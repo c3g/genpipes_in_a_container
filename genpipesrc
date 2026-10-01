@@ -8,6 +8,12 @@ mount -l | grep soft.mugqic 2>/dev/null 1>&2
 retcode=$?
 if [ ${retcode} -ne 0 ] ; then
     # should only run in docker container, not singularity
+    # As root, cvmfs2 fails if it cannot raise its open files limit (CVMFS_NFILES) above the container
+    # hard limit, e.g. 65536 on GitHub runners: lower CVMFS_NFILES to that limit
+    NOFILE_HARD=$(ulimit -Hn)
+    if [ "${NOFILE_HARD}" != "unlimited" ] && [ "${NOFILE_HARD}" -lt 131072 ]; then
+        echo "CVMFS_NFILES=${NOFILE_HARD}" > /etc/cvmfs/default.d/90-giac-nofile.conf
+    fi
     mount -t cvmfs cvmfs-config.computecanada.ca /cvmfs/cvmfs-config.computecanada.ca/
     mount -t cvmfs ref.mugqic /cvmfs/ref.mugqic
     mount -t cvmfs soft.mugqic /cvmfs/soft.mugqic
