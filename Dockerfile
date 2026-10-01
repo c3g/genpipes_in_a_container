@@ -49,4 +49,8 @@ RUN ["ln", "-s", "/usr/local/etc/genpiperc", "/etc/profile.d/z90_genpipes.sh"]
 
 ADD init_genpipes /usr/local/bin/init_genpipes
 RUN chmod 755 /usr/local/bin/init_genpipes
+# GiaC release version, set by the publish workflows from the image tag
+ARG GIAC_VERSION=dev
+ENV GIAC_VERSION=${GIAC_VERSION}
+
 ENTRYPOINT ["init_genpipes"]

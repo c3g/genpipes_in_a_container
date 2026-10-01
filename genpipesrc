@@ -18,6 +18,9 @@ module use $MUGQIC_INSTALL_HOME/modulefiles
 if [ -z "${GENPIPES_VERSION}" ]; then
     GENPIPES_VERSION=$(module avail -d mugqic/genpipes 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
     export GENPIPES_VERSION=${GENPIPES_VERSION}
+    GENPIPES_VERSION_SOURCE="default from CVMFS"
+else
+    GENPIPES_VERSION_SOURCE="requested"
 fi
 
 if [[ ${GENPIPES_VERSION##/} =~ ^3\.[0-9]+\.[0-9]+ ]]; then
@@ -46,3 +49,6 @@ else
     # Not in development mode
     module load mugqic/genpipes/${GENPIPES_VERSION}
 fi
+
+# Tell which GiaC and GenPipes versions are in use (stderr, to keep command outputs clean)
+echo "GiaC ${GIAC_VERSION:-unknown} - GenPipes ${GENPIPES_VERSION} (${GENPIPES_VERSION_SOURCE})" >&2

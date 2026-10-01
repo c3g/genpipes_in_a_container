@@ -75,6 +75,8 @@ jobs:
           push: ${{ github.event.pull_request.head.repo.fork == false }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GIAC_VERSION=${{ steps.meta.outputs.version }}
 
       # This step generates an artifact attestation for the image, which is an unforgeable statement about where and how it was built.
       # It increases supply chain security for people who consume the image.

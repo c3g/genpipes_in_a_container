@@ -6,6 +6,8 @@ SCRIPTPATH=${SCRIPTPATH%%bin}
 SCRIPTPATH=${SCRIPTPATH%%/}
 GENPIPES_SHARED_CVMFS=/tmp/cvmfs-cache
 GENPIPES_CONTAINERTYPE=singularity
+# Docker/Podman image, pinned to the matching release tag in released wrapper bundles
+GIAC_IMAGE=ghcr.io/c3g/genpipes_in_a_container:latest
 
 source "${SCRIPTPATH}"/etc/wrapper.conf
 
@@ -111,7 +113,7 @@ elif [ "$GENPIPES_CONTAINERTYPE" = "docker" ]; then
       -w $PWD \
       -v $PWD:$PWD \
       --mount type=bind,source=${GENPIPES_SHARED_CVMFS},target=/cvmfs-cache ${GENPIPES_MOUNT} \
-      ghcr.io/c3g/genpipes_in_a_container:latest "$@"
+      ${GIAC_IMAGE} "$@"
   else
     docker run \
       -it \
@@ -126,7 +128,7 @@ elif [ "$GENPIPES_CONTAINERTYPE" = "docker" ]; then
       -v $PWD:$PWD \
       ${BIND_MOUNTS} \
       --mount type=bind,source=${GENPIPES_SHARED_CVMFS},target=/cvmfs-cache ${GENPIPES_MOUNT} \
-      ghcr.io/c3g/genpipes_in_a_container:latest "$@"
+      ${GIAC_IMAGE} "$@"
   fi
 elif [ "$GENPIPES_CONTAINERTYPE" = "podman" ]; then
   if [ -z "${GENPIPES_DIR}" ]; then
@@ -152,7 +154,7 @@ elif [ "$GENPIPES_CONTAINERTYPE" = "podman" ]; then
       -w $PWD \
       -v $PWD:$PWD \
       --mount type=bind,source=${GENPIPES_SHARED_CVMFS},target=/cvmfs-cache,Z ${GENPIPES_MOUNT} \
-      ghcr.io/c3g/genpipes_in_a_container:latest "$@"
+      ${GIAC_IMAGE} "$@"
   else
     podman run \
       -it \
@@ -166,7 +168,7 @@ elif [ "$GENPIPES_CONTAINERTYPE" = "podman" ]; then
       -v $PWD:$PWD \
       ${BIND_MOUNTS} \
       --mount type=bind,source=${GENPIPES_SHARED_CVMFS},target=/cvmfs-cache,Z ${GENPIPES_MOUNT} \
-      ghcr.io/c3g/genpipes_in_a_container:latest "$@"
+      ${GIAC_IMAGE} "$@"
   fi
 else
   echo "Unknown GENPIPES_CONTAINERTYPE $GENPIPES_CONTAINERTYPE. Choose between 'singularity', 'apptainer', 'docker' or 'podman'. Exiting."
