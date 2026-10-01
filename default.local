@@ -1,3 +1,5 @@
 CVMFS_QUOTA_LIMIT=5000
 CVMFS_HTTP_PROXY="auto;DIRECT"
 CVMFS_CACHE_BASE=/cvmfs-cache
+# Keep CVMFS sockets and locks off the cache bind mount (Unix sockets fail on macOS Docker file sharing)
+CVMFS_WORKSPACE=/var/run/cvmfs/workspace

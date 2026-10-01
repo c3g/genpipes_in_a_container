@@ -8,6 +8,12 @@ mount -l | grep soft.mugqic 2>/dev/null 1>&2
 retcode=$?
 if [ ${retcode} -ne 0 ] ; then
     # should only run in docker container, not singularity
+    # As root, cvmfs2 fails if it cannot raise its open files limit (CVMFS_NFILES) above the container
+    # hard limit, e.g. 65536 on GitHub runners: lower CVMFS_NFILES to that limit
+    NOFILE_HARD=$(ulimit -Hn)
+    if [ "${NOFILE_HARD}" != "unlimited" ] && [ "${NOFILE_HARD}" -lt 131072 ]; then
+        echo "CVMFS_NFILES=${NOFILE_HARD}" > /etc/cvmfs/default.d/90-giac-nofile.conf
+    fi
     mount -t cvmfs cvmfs-config.computecanada.ca /cvmfs/cvmfs-config.computecanada.ca/
     mount -t cvmfs ref.mugqic /cvmfs/ref.mugqic
     mount -t cvmfs soft.mugqic /cvmfs/soft.mugqic
@@ -15,15 +21,18 @@ fi
 
 module use $MUGQIC_INSTALL_HOME/modulefiles
 
-if [ -z "${GENPIPES_VERSION+x}" ]; then
-    GENPIPES_VERSION=$(module avail -d mugqic/genpipes 2>&1 | grep -o '[0-9]\.[0-9]\.[0-9]')
+if [ -z "${GENPIPES_VERSION}" ]; then
+    GENPIPES_VERSION=$(module avail -d mugqic/genpipes 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
     export GENPIPES_VERSION=${GENPIPES_VERSION}
+    GENPIPES_VERSION_SOURCE="default from CVMFS"
+else
+    GENPIPES_VERSION_SOURCE="requested"
 fi
 
-if [[ ${GENPIPES_VERSION##/} =~ 3\.[0-9]+\.[0-9]+ ]]; then
+if [[ ${GENPIPES_VERSION##/} =~ ^3\.[0-9]+\.[0-9]+ ]]; then
     # version 3 releases are in python 2
     module load mugqic/python/2.7.14
-elif [[ ${GENPIPES_VERSION##/} =~ 4\.[0-9]+\.[0-9]+ ]]; then
+elif [[ ${GENPIPES_VERSION##/} =~ ^4\.[0-9]+\.[0-9]+ ]]; then
     # version 4 releases are in python 3
     module load mugqic/python/3.10.4
 else
@@ -46,3 +55,6 @@ else
     # Not in development mode
     module load mugqic/genpipes/${GENPIPES_VERSION}
 fi
+
+# Tell which GiaC and GenPipes versions are in use (stderr, to keep command outputs clean)
+echo "GiaC ${GIAC_VERSION:-unknown} - GenPipes ${GENPIPES_VERSION} (${GENPIPES_VERSION_SOURCE})" >&2

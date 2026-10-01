@@ -16,6 +16,8 @@ env:
 jobs:
   build-and-push-docker:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
 
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:
@@ -67,6 +69,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GIAC_VERSION=${{ steps.meta.outputs.version }}
 
       # This step generates an artifact attestation for the image, which is an unforgeable statement about where and how it was built.
       # It increases supply chain security for people who consume the image.
@@ -78,8 +82,19 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
-  build-and-push-apptainer:
+  # Tests the image that was just pushed, the sif and the release bundle are only built if it passes
+  smoke-test:
     needs: build-and-push-docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run smoke test
+        run: tests/smoke_image.sh ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build-and-push-docker.outputs.version }} ${{ needs.build-and-push-docker.outputs.version }}
+
+  build-and-push-apptainer:
+    needs: [build-and-push-docker, smoke-test]
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.ref, 'refs/tags/') }}
     steps:
@@ -90,11 +105,15 @@ jobs:
       - name: Create sif image
         run: |
           mkdir -p container/wrapper_genpipes/images
+          sed -i 's#^GIAC_IMAGE=.*#GIAC_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}#' container/wrapper_genpipes/bin/container_wrapper.sh
           apptainer build -F container/wrapper_genpipes/images/genpipes-${{ github.ref_name }}.sif docker://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
           cd container/wrapper_genpipes/images/
           ln -sf genpipes-${{ github.ref_name }}.sif genpipes.sif
           cd ../../
           tar -zcvf wrapper_genpipes.tgz wrapper_genpipes
+      - name: Check release bundle
+        run: tests/check_release_bundle.sh container/wrapper_genpipes.tgz ${{ github.ref_name }}
+
       - name: Upload sif image
         uses: svenstaro/upload-release-action@v2
         with:

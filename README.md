@@ -1,18 +1,50 @@
 # GenPipes in a container
 
+[![GiaC release](https://img.shields.io/github/v/release/c3g/genpipes_in_a_container?label=GiaC)](https://github.com/c3g/genpipes_in_a_container/releases/latest) [![GenPipes versions](https://img.shields.io/badge/runs%20GenPipes-4.x%20%7C%206.x-blue)](#giac-and-genpipes-versions)
+
 You can use GenPipes in a Container (GiaC) to run GenPipes on a single machine, on a Torque/PBS cluster or on a SLURM cluster.
 
 If Singularity/Docker is installed on your LINUX machine you are all set, a simple user with no special privilege is enough (no sudo needed).
 
-While you can use (GiaC) to debug GenPipes on your laptop, [GenPipes](https://bitbucket.org/mugqic/genpipes/src/master/README.md) is design to run analysis on Super Computers.
+The software available in CVMFS is built for x86-64 only. GiaC works on x86-64 Linux and on macOS with Docker Desktop (tested on Apple silicon with Rosetta enabled). It does not work on arm64 Linux (e.g. AWS Graviton or an arm64 virtual machine).
+
+The container downloads the CVMFS data itself, so the machine needs outbound plain HTTP access (ports 80 and 8000) to the CVMFS servers. Sites where this access is only possible through a proxy are not supported yet. On such a machine, CVMFS fails with `Failed to initialize root file catalog`.
+
+While you can use (GiaC) to debug GenPipes on your laptop, [GenPipes](https://github.com/c3g/GenPipes/blob/main/README.md) is design to run analysis on Super Computers.
+
+## GiaC and GenPipes versions
+
+The GiaC version is the version of the container image and of the wrapper (`container_wrapper.sh`, `wrapper.conf`). It is not the GenPipes version. GenPipes is not part of the image: the container loads it from CVMFS when it starts, by default the version marked as default in CVMFS (usually the latest release), or the one set with `GENPIPES_VERSION` in `wrapper.conf` or `-V <VERSION>`. When it starts, the container prints the versions in use, for example `GiaC v4.1.0 - GenPipes 6.2.0 (default from CVMFS)`.
+
+| GiaC release | GenPipes versions it can run | Installed by default by `genpipes tools get_wrapper` in |
+|---|---|---|
+| v4.1.0 | 4.x and 6.x | Not yet, use `genpipes tools get_wrapper -v v4.1.0` |
+| v4.0.0 | 4.x and 6.x | GenPipes 6.0.0 to 6.2.x |
+| v3.0.x | 3.x and 4.x | None |
+| v2.1.0 | 3.x and 4.x | GenPipes 4.x and 5.x |
+| v2.0.x | 3.x | GenPipes 3.5 and 3.6 |
+
+GenPipes 5 does not work with the container: use GenPipes 6 instead, or GenPipes 4 for deprecated pipelines (see [GenPipes 4 in a Container](#genpipes-4-in-a-container)). GiaC releases before v4.0.0 use different variable names in `wrapper.conf`.
 
 ## Install a compatible container technology on your machine
 
 Follow installation procedure from the [Apptainer install page](https://apptainer.org/docs/user/latest/quick_start.html#installation) or the [Docker install page](https://docs.docker.com/get-docker/).
 
+When using Docker on macOS, containers run inside a Linux virtual machine. An intermittent issue has been observed affecting CVMFS/FUSE initialization when using certain Docker Desktop virtualization and file system configurations.
+
+This issue can be mitigated by using:
+* Apple Virtualization Framework as the Virtual Machine Manager (VMM)
+* gRPC FUSE as the file sharing implementation
+
+These settings can be configured in Docker Desktop under:
+
+`Settings > Virtual Machine Options`
+
+<img width="2756" height="1458" alt="Docker_config" src="https://github.com/user-attachments/assets/90155c69-964b-49ba-9020-ec9ab9fd0c22" />
+
 ## What exactly is available in that container?
 
-The full tested and integrated C3G/MUGQIC software stack: a complete set of genomics references and bioinformatics software; [for more details](http://www.computationalgenomics.ca/cvmfs-modules/).
+A collection of bioinformatics software modules available under `/cvmfs/soft.mugqic`. It also includes a set of genomic references and test data, available under `/cvmfs/ref.mugqic`.
 
 ## Setup a GiaC environment
 
@@ -21,7 +53,7 @@ You can use this container to test new version of GenPipes. The following docume
 First, clone GenPipes and install it:
 
 ```bash
-git clone --branch <GENPIPES_VERSION> https://bitbucket.org/mugqic/genpipes genpipes-<GENPIPES_VERSION>
+git clone --branch <GENPIPES_VERSION> https://github.com/c3g/GenPipes.git genpipes-<GENPIPES_VERSION>
 cd genpipes-<GENPIPES_VERSION>
 pip install .
 ```
@@ -29,7 +61,7 @@ pip install .
 If you prefer to have a virtual environment for GenPipes:
 
 ```bash
-git clone --branch <GENPIPES_VERSION> https://bitbucket.org/mugqic/genpipes genpipes-<GENPIPES_VERSION>
+git clone --branch <GENPIPES_VERSION> https://github.com/c3g/GenPipes.git genpipes-<GENPIPES_VERSION>
 cd genpipes-<GENPIPES_VERSION>
 python3 -m venv .genpipes_venv
 source .genpipes_venv/bin/activate
@@ -41,7 +73,14 @@ Then, install the wrapper:
 genpipes tools get_wrapper
 ```
 
-You can now configure the `genpipes/resources/container/etc/wrapper.conf` file:
+The wrapper is installed in a `resources/container` folder next to the installed `genpipes` package: in `site-packages` with `pip install .`, or at the root of the clone with `pip install -e .`. To find it:
+
+```bash
+GIAC_DIR=$(python3 -c "import genpipes, os; print(os.path.join(os.path.dirname(os.path.dirname(genpipes.__file__)), 'resources', 'container'))")
+echo $GIAC_DIR
+```
+
+You can now configure the `$GIAC_DIR/etc/wrapper.conf` file:
 
 ```bash
 # GENPIPES_SHARED_CVMFS should have a sufficient amount of space to load full reference files
@@ -52,15 +91,17 @@ GENPIPES_VERSION=
 GENPIPES_DIR=
 ```
 
-`GENPIPES_SHARED_CVMFS` will hold a cache for GiaC [CVMFS](https://cernvm.cern.ch/portal/filesystem) system, it will hold the genomes and software being used by GenPipes. This folder will grow with GenPipes usage. You can delete it in between usage, but keep in mind that once deleted it will need to be rebuild by downloading data form the internet.
+`GENPIPES_SHARED_CVMFS` will hold a cache for GiaC [CVMFS](https://cernvm.cern.ch/portal/filesystem) system, it will hold the genomes and software being used by GenPipes. This folder will grow with GenPipes usage. You can delete it in between usage, but keep in mind that once deleted it will need to be rebuild by downloading data form the internet. With Docker or Podman on Linux, the cache files belong to the container `cvmfs` user, so you need `sudo` to delete them.
 
-`BIND_LIST` is a list of file system, separated by comma, you need GenPipes to have access to, by default, only your $HOME is mounted. For example if you are on an HPC system with a `/scratch` and `/data` space, you would have `BIND_LIST=/scratch,/data`. The string will be fed to Singularity `--bind` option, see `apptainer --help` for more details.
+`BIND_LIST` is a list of file system, separated by comma, you need GenPipes to have access to, by default, only your $HOME is mounted. For example if you are on an HPC system with a `/scratch` and `/data` space, you would have `BIND_LIST=/scratch,/data`. The string will be fed to Singularity `--bind` option, see `apptainer --help` for more details. With Docker or Podman, each path is mounted with its own `--mount` option.
 
 `GENPIPES_CONTAINERTYPE` is the container to use, either `apptainer` (default), `singularity`, `docker` or `podman`.
 
 `GENPIPES_VERSION` is the version of GenPipes to use, by default the latest version is used. The version has to be released and installed in cvmfs. Make sure the version chosen is the same as the one you installed otherwise you might have unrecognized arguments or unexpected behavior. If you want to use the local installed version set it to `local`, see [Using a local GenPipes version](#using-a-local-genpipes-version) below. If you want to use a version below 5 see [GenPipes 4 in a Container](#genpipes-4-in-a-container). GenPipes 5 is not working with the container, use GenPipes 6 instead, or GenPipes 4 for deprecated pipelines.
 
 `GENPIPES_DIR` is the directory where GenPipes is locally cloned. See [Using a local GenPipes version](#using-a-local-genpipes-version) below.
+
+`GIAC_IMAGE` (optional, Docker and Podman only) is the image to run. A released wrapper uses the image of the same GiaC release, e.g. `ghcr.io/c3g/genpipes_in_a_container:v4.1.0`. Add `GIAC_IMAGE=ghcr.io/c3g/genpipes_in_a_container:latest` to `wrapper.conf` to use the latest image instead.
 
 You do not need any other setup on your machine.
 
@@ -76,11 +117,24 @@ You will find GenPipes detailed documentation [here](https://genpipes.readthedoc
 ## With the wrapper
 [Read the GenPipes documentation](https://genpipes.readthedocs.io/en/latest/deploy/dep_gp_container.html), follow guidelines there to launch a GenPipes pipeline and add the `--wrap`, `-j batch` and `--no-json` options. In that case you'll NOT use any scheduler system and GenPipes analysis might be longer.
 
-You can also run the `genpipes/resources/container/bin/container_wrapper.sh` command to get inside the container with the right configuration. You will then have access to all the GenPipes tools be able to run them directly inside the container, on a single host WITHOUT the `--wrap` option.
-To use a GenPipes version other than latest run `genpipes/resources/container/bin/container_wrapper.sh -V <VERSION>`.
+You can also run the `$GIAC_DIR/bin/container_wrapper.sh` command to get inside the container with the right configuration. You will then have access to all the GenPipes tools be able to run them directly inside the container, on a single host WITHOUT the `--wrap` option.
+To use a GenPipes version other than latest run `$GIAC_DIR/bin/container_wrapper.sh -V <VERSION>`.
 
 ## Without the wrapper
 To use a GenPipes version other than latest add `-V <VERSION>` at the end of one of the command below. To test a cloned version, set `-V local` and mount the cloned directory with the right command. See detail in each section.
+
+The commands below read `GENPIPES_SHARED_CVMFS` and `BIND_LIST` from your shell, not from `wrapper.conf`. Set them and create the cache directory first:
+
+```bash
+# GENPIPES_SHARED_CVMFS should have a sufficient amount of space to load full reference files
+export GENPIPES_SHARED_CVMFS=$HOME/cvmfs
+export BIND_LIST=/scratch,/data
+mkdir -p ${GENPIPES_SHARED_CVMFS}
+# Docker/Podman: the container cvmfs user must be able to enter the cache directory
+chmod go+rx ${GENPIPES_SHARED_CVMFS}
+```
+
+If `GENPIPES_SHARED_CVMFS` is not set, CVMFS fails with `cannot create workspace directory /cvmfs-cache/...` and GenPipes is not available in the container.
 
 ### Using Apptainer
 With `GENPIPES_SHARED_CVMFS` being the cache directory on the host, `BIND_LIST` the file system to be accessed by GenPipes, {IMAGE_PATH}/genpipes.sif the [latest sif file released](https://github.com/c3g/genpipes_in_a_container/releases/latest). To use the cloned version, mount the directory with `-B ${GENPIPES_DIR}:/genpipes` option.
@@ -109,10 +163,11 @@ With `GENPIPES_SHARED_CVMFS` being the cache directory on the host, `BIND_LIST` 
   ${IMAGE_PATH}/genpipes.sif
 ```
 ### Using Docker
-With `GENPIPES_SHARED_CVMFS` being the cache directory on the host and `BIND_LIST` the file system to be accessed by GenPipes. To use the cloned version, mount the directory with `--mount type=bind,source=${GENPIPES_DIR},target=/genpipes` option.
+With `GENPIPES_SHARED_CVMFS` being the cache directory on the host and `BIND_LIST` the file system to be accessed by GenPipes (one path, add one `--mount` option per extra path). To use the cloned version, mount the directory with `--mount type=bind,source=${GENPIPES_DIR},target=/genpipes` option. The `--security-opt apparmor=unconfined` option is needed on hosts using AppArmor (e.g. Ubuntu), because the default Docker AppArmor profile blocks the CVMFS mount.
 ```bash
 docker run \
   -it \
+  --security-opt apparmor=unconfined \
   --env-file $HOME/.genpipes_env \
   --rm \
   --device /dev/fuse \
@@ -125,7 +180,7 @@ docker run \
   ghcr.io/c3g/genpipes_in_a_container:latest
 ```
 ### Using Podman
-With `GENPIPES_SHARED_CVMFS` being the cache directory on the host and `BIND_LIST` the file system to be accessed by GenPipes. WARNING: Not supported on Mac OS X yet. To use the cloned version, mount the directory with `--mount type=bind,source=${GENPIPES_DIR},target=/genpipes,Z` option.
+With `GENPIPES_SHARED_CVMFS` being the cache directory on the host and `BIND_LIST` the file system to be accessed by GenPipes (one path, add one `--mount` option per extra path). WARNING: Not supported on Mac OS X yet. To use the cloned version, mount the directory with `--mount type=bind,source=${GENPIPES_DIR},target=/genpipes,Z` option.
 ```bash
 podman run \
   -it \
@@ -137,13 +192,13 @@ podman run \
   -w $PWD \
   -v $PWD:$PWD \
   --mount type=bind,source=${BIND_LIST},target=${BIND_LIST},Z \
-  --mount type=bind,source=$HOME/cvmfs,target=/cvmfs-cache,Z \
+  --mount type=bind,source=${GENPIPES_SHARED_CVMFS},target=/cvmfs-cache,Z \
   ghcr.io/c3g/genpipes_in_a_container:latest
 ```
 
 # Using a local GenPipes version
 
-If you want to use a local GenPipes version, you can use the `GENPIPES_DIR` variable in the `wrapper.conf` file. This variable should point to the directory where GenPipes is installed. The `GENPIPES_VERSION` variable should be left empty.
+If you want to use a local GenPipes version, you can use the `GENPIPES_DIR` variable in the `wrapper.conf` file. This variable should point to the directory where GenPipes is installed. The `GENPIPES_VERSION` variable should be set to `local`, an empty value uses the latest released version.
 
 ```bash
 # GENPIPES_SHARED_CVMFS should have a sufficient amount of space to load full reference files
