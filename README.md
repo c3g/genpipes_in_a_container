@@ -1,5 +1,7 @@
 # GenPipes in a container
 
+[![GiaC release](https://img.shields.io/github/v/release/c3g/genpipes_in_a_container?label=GiaC)](https://github.com/c3g/genpipes_in_a_container/releases/latest) [![GenPipes versions](https://img.shields.io/badge/runs%20GenPipes-4.x%20%7C%206.x-blue)](#giac-and-genpipes-versions)
+
 You can use GenPipes in a Container (GiaC) to run GenPipes on a single machine, on a Torque/PBS cluster or on a SLURM cluster.
 
 If Singularity/Docker is installed on your LINUX machine you are all set, a simple user with no special privilege is enough (no sudo needed).
@@ -9,6 +11,20 @@ The software available in CVMFS is built for x86-64 only. GiaC works on x86-64 L
 The container downloads the CVMFS data itself, so the machine needs outbound plain HTTP access (ports 80 and 8000) to the CVMFS servers. Sites where this access is only possible through a proxy are not supported yet. On such a machine, CVMFS fails with `Failed to initialize root file catalog`.
 
 While you can use (GiaC) to debug GenPipes on your laptop, [GenPipes](https://github.com/c3g/GenPipes/blob/main/README.md) is design to run analysis on Super Computers.
+
+## GiaC and GenPipes versions
+
+The GiaC version is the version of the container image and of the wrapper (`container_wrapper.sh`, `wrapper.conf`). It is not the GenPipes version. GenPipes is not part of the image: the container loads it from CVMFS when it starts, by default the version marked as default in CVMFS (usually the latest release), or the one set with `GENPIPES_VERSION` in `wrapper.conf` or `-V <VERSION>`. When it starts, the container prints the versions in use, for example `GiaC v4.1.0 - GenPipes 6.2.0 (default from CVMFS)`.
+
+| GiaC release | GenPipes versions it can run | Installed by default by `genpipes tools get_wrapper` in |
+|---|---|---|
+| v4.1.0 | 4.x and 6.x | Not yet, use `genpipes tools get_wrapper -v v4.1.0` |
+| v4.0.0 | 4.x and 6.x | GenPipes 6.0.0 to 6.2.x |
+| v3.0.x | 3.x and 4.x | None |
+| v2.1.0 | 3.x and 4.x | GenPipes 4.x and 5.x |
+| v2.0.x | 3.x | GenPipes 3.5 and 3.6 |
+
+GenPipes 5 does not work with the container: use GenPipes 6 instead, or GenPipes 4 for deprecated pipelines (see [GenPipes 4 in a Container](#genpipes-4-in-a-container)). GiaC releases before v4.0.0 use different variable names in `wrapper.conf`.
 
 ## Install a compatible container technology on your machine
 
@@ -84,6 +100,8 @@ GENPIPES_DIR=
 `GENPIPES_VERSION` is the version of GenPipes to use, by default the latest version is used. The version has to be released and installed in cvmfs. Make sure the version chosen is the same as the one you installed otherwise you might have unrecognized arguments or unexpected behavior. If you want to use the local installed version set it to `local`, see [Using a local GenPipes version](#using-a-local-genpipes-version) below. If you want to use a version below 5 see [GenPipes 4 in a Container](#genpipes-4-in-a-container). GenPipes 5 is not working with the container, use GenPipes 6 instead, or GenPipes 4 for deprecated pipelines.
 
 `GENPIPES_DIR` is the directory where GenPipes is locally cloned. See [Using a local GenPipes version](#using-a-local-genpipes-version) below.
+
+`GIAC_IMAGE` (optional, Docker and Podman only) is the image to run. A released wrapper uses the image of the same GiaC release, e.g. `ghcr.io/c3g/genpipes_in_a_container:v4.1.0`. Add `GIAC_IMAGE=ghcr.io/c3g/genpipes_in_a_container:latest` to `wrapper.conf` to use the latest image instead.
 
 You do not need any other setup on your machine.
 
