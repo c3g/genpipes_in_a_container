@@ -18,8 +18,8 @@ The GiaC version is the version of the container image and of the wrapper (`cont
 
 | GiaC release | GenPipes versions it can run | Installed by default by `genpipes tools get_wrapper` in |
 |---|---|---|
-| v4.1.0 | 4.x and 6.x | Not yet, use `genpipes tools get_wrapper -v v4.1.0` |
-| v4.0.0 | 4.x and 6.x | GenPipes 6.0.0 to 6.2.x |
+| v4.1.0 | 4.x and 6.x | GenPipes 6.2.1 and later |
+| v4.0.0 | 4.x and 6.x | GenPipes 6.0.0 to 6.2.0 |
 | v3.0.x | 3.x and 4.x | None |
 | v2.1.0 | 3.x and 4.x | GenPipes 4.x and 5.x |
 | v2.0.x | 3.x | GenPipes 3.5 and 3.6 |
